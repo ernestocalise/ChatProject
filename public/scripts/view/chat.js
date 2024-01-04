@@ -1,21 +1,16 @@
 import {ajaxCall} from "./../ajaxCalls.js";
 import {global} from "./../globalFunctions.js"
 var chatProject = chatProject || {};
+
+//Reading data from Laravel
 chatProject.fromPhpPage = JSON.parse($("#fromPhpPage").val());
 $("#fromPhpPage").remove();
+chatProject.texts = {}
+chatProject.texts = JSON.parse($("#fromPhpLocale").val());
+//$("#fromPhpLocale").remove();
+//Setting up chatPage
 chatProject.ajaxCall = ajaxCall().chat;
 chatProject.fh = global();
-chatProject.texts = {
-    "show_contact" : "Show Contact",
-    "show_chats" : "Show Chats",
-    "You" : "You",
-    "status-online" : "Online",
-    "status-away" : "Away",
-    "status-call" : "In a call",
-    "status-busy" : "Busy",
-    "status-invisible" : "Invisible",
-    "status-offline" : "Offline",
-}
 chatProject.chatPage = (function (me) {
     var _activeChatId = 0;
     var _arrCurrentChats = [];

@@ -5,13 +5,26 @@
 </div>
 <input type="hidden" id="fromPhpPage" value="">
 <script>
-	let phpPageData = {
+	var phpPageData = {
 		personalUserId: {{auth()->user()->id}},
 		initialUserStatus: {{auth()->user()->getStatus()}}
 	};
+	var phpLocaleData = {
+		"show_contact": `{{__("chat.show_contact")}}`,
+		"show_chats": `{{__("chat.show_chats")}}`,
+		"You": `{{__("chat.You")}}`,
+		"status-online" : `{{__("chat.status-online")}}`,
+    	"status-away" : `{{__("chat.status-away")}}`,
+    	"status-call" : `{{__("chat.status-call")}}`,
+    	"status-busy" : `{{__("chat.status-busy")}}`,
+    	"status-invisible" : `{{__("chat.status-invisible")}}`,
+    	"status-offline" : `{{__("chat.status-offline")}}`,
+	};
 	$("#fromPhpPage").val(JSON.stringify(phpPageData));
+	$("#fromPhpLocale").val(JSON.stringify(phpLocaleData));
 </script>
-<input type="hidden" id="phpPageData">
+<input type="hidden" id="fromPhpPage">
+<input type="hidden" id="fromPhpLocale">
 <div id="frame">
 	<div id="sidepanel">
 		<div id="profile">
