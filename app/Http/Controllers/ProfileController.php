@@ -60,10 +60,12 @@ class ProfileController extends Controller
 
     //Manage User Status
     public function setStatus($statusCode) {
-        auth()->user()->setStatus($statusCode);
+        $data = validator(compact("statusCode"), ["statusCode" => "required|numeric"])->validate();
+        auth()->user()->setStatus($data["statusCode"]);
     }
     public function getStatus($userId) {
-        $usr = \App\Models\User::find($userId);
+        $data = validator(compact("userId"), ["userId" => "required|numeric"])->validate();
+        $usr = \App\Models\User::find($data["userId"]);
         return $usr->getStatus();
     }
     public function restoreStatus() {

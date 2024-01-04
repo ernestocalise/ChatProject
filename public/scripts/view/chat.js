@@ -224,10 +224,10 @@ chatProject.chatPage = (function (me) {
             'chatId': chatId,
             'messageId': messageId
         };
-        _successCallback = function(data) {
+        let _successCallback = function(data) {
             if(_activeChatId == chatId) {
                 data.messages.forEach( singleMessage => 
-                    addMessage(singleMessage)
+                    _addMessage(singleMessage)
                 );
             }
             let _chatIndex = _arrCurrentChats.findIndex(currChat => currChat.chatId == chatId);
@@ -245,7 +245,7 @@ chatProject.chatPage = (function (me) {
     };
     var _sendMessage = function() {
         let _message = $("#txtMessage").val();
-        if(!chatProject.fh.isStringEmpty(_message)) {
+        if(!chatProject.fh.string.isStringEmpty(_message)) {
             _widgets.chatBox.txtMessage.val("");
             let data = {
                 "_token": _widgets.csrf_token.attr("content"),

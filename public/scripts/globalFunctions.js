@@ -1,6 +1,6 @@
 export function global() {
     var _isStringEmpty = function(str) {
-        if(message != null && message.trim() != "") return false;
+        if(str != null && str.trim() != "") return false;
         return true;
     };
     var _showLoader = function() {

@@ -59,8 +59,8 @@ export function ajaxCall() {
     var _checkChatChanged = function(data, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executePOSTRequest("/chats/checkChatChanged", data, successCallback, errorCallback);
     };
-    var _updateChat = function(data, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
-        _executePOSTRequest("/chats/getNewMessages", successCallback, errorCallback);
+    var _updateChat = function(params, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executePOSTRequest("/chats/getNewMessages", params, successCallback, errorCallback);
     };
     var _sendMessage = function(data, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executePOSTRequest("/chats/sendMessage", data, successCallback, errorCallback);

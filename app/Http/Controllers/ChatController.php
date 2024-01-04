@@ -9,6 +9,8 @@ use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use File;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class ChatController extends Controller
 {
     public function index() {
@@ -16,10 +18,14 @@ class ChatController extends Controller
         return view('chat.index', compact("users"));
     }
     public function getChatMessages($chatId) {
-        return Chat::find($chatId)->getChatMessages();
+        $data = validator(compact("chatId"), ["chatId" => "required|numeric"])->validate();
+        return Chat::find($data["chatId"])->getChatMessages();
     }
-    public static function openOrCreateChat() {
-        $targetUserId = request("userId");
+    public static function openOrCreateChat(Request $request) {
+        $data = $request->validate([
+            "userId" => "required|numeric"
+        ]);
+        $targetUserId = $data["userId"];
         $collUserIds = [];
         $collUserIds[] = $targetUserId;
         $collUserIds[] = auth()->user()->id;
@@ -40,22 +46,34 @@ class ChatController extends Controller
         }
     }
     public function checkChatChanged(Request $request) {
-        $chatId = $request->input("chatId");
-        $lastMessageId = $request->input("messageId");
+        $data = $request->validate([
+            "chatId" => "required|numeric",
+            "messageId" => "required|numeric"
+        ]);
+        $chatId = $data["chatId"];
+        $lastMessageId = $data["messageId"];
         $chat = Chat::find($chatId);
         return (object)[
             "chatChanged" => !($chat->getLastMessageAttribute()->messageId == $lastMessageId)
         ];
     }
     public function getNewMessages(Request $request) {
-        $chatId = $request->input("chatId");
-        $lastMessageId = $request->input("messageId");
+        $data = $request->validate([
+            "chatId" => "required|numeric",
+            "messageId" => "required|numeric"
+        ]);
+        $chatId = $data["chatId"];
+        $lastMessageId = $data["messageId"];
         $chat = Chat::find($chatId);
         return $chat->getMessagesAfter($lastMessageId);
     }
     public function sendMessage(Request $request) {
-        $message = $request->input("message");
-        $chatId = $request->input("chatId");
+        $data = $request->validate([
+            "chatId" => "required|numeric",
+            "message" => "string|required"
+        ]);
+        $message = htmlspecialchars($data["message"]);
+        $chatId = $data["chatId"];
         $chatMessage = new \App\Models\ChatMessage();
         $chatMessage->user_id = auth()->user()->id;
         $chatMessage->chat_id = $chatId;
@@ -70,12 +88,20 @@ class ChatController extends Controller
         ->get();
     }
     public function setVisualizzation($messageId) {
-        $message = ChatMessage::find($messageId);
+        $data = validator(compact("messageId"), ["messageId" => "required|numeric"])->validate();
+        $message = ChatMessage::find($data["messageId"]);
         $message->SetVisualizzation();
     }
     public function uploadFile(Request $request) {
-        $chatId = $request->input("chatId");
-        $file = $request->file("file");
+        $data = $request->validate(
+            [
+                "chatId" => "numeric|required",
+                "file" => File::types(["image/*",".zip",".rar",".pdf",".doc",".txt"])
+                ->max("25mb")
+            ]
+        );
+        $chatId = $data["chatId"];
+        $file = $data["file"];
         $fileName = $file->getClientOriginalName();
         $fileMimeType = $file->getMimeType();
         $destinationPath = "storage/{$chatId}";
@@ -85,7 +111,7 @@ class ChatController extends Controller
             if(in_array($fileMimeType, $imageMimeTypes))
             $isImage = true;
         //Check if chatfolder exists or create ut
-        File::isDirectory($destinationPath) or File::makeDirectory($destinationPath, 0777, true, true);
+        File::isDirectory($destinationPath) or \Illuminate\Validation\Rules\File::makeDirectory($destinationPath, 0777, true, true);
         $filePath = "{$destinationPath}/{$fileName}";
         $iterator = 1;
         $tempFilePath = $filePath;
