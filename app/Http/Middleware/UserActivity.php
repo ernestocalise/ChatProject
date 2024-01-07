@@ -27,7 +27,7 @@ class UserActivity
         }
         //To check for Locale
         if(Session::get("locale") == null)
-            Session::put("locale", "en");
+            Session::put("locale", config("app.locale"));
         App::setLocale(Session::get("locale"));
         return $next($request);
     }
