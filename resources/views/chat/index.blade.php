@@ -3,13 +3,19 @@
 <div class="csrf-container">
 @csrf
 </div>
-<input type="hidden" id="fromPhpPage" value="">
+<!-- SECTION PAGE SETUP -->
+<input type="hidden" id="fromPhpPage" />
+<input type="hidden" id="fromPhpLocale" />
 <script>
-	var phpPageData = {
+//Setup for JS page
+	var phpPageData;
+	var phpLocaleData;
+	function setPageData() {
+	phpPageData = {
 		personalUserId: {{auth()->user()->id}},
 		initialUserStatus: {{auth()->user()->getStatus()}}
 	};
-	var phpLocaleData = {
+	phpLocaleData = {
 		"show_contact": `{{__("chat.show_contact")}}`,
 		"show_chats": `{{__("chat.show_chats")}}`,
 		"You": `{{__("chat.You")}}`,
@@ -20,11 +26,16 @@
     	"status-invisible" : `{{__("chat.status-invisible")}}`,
     	"status-offline" : `{{__("chat.status-offline")}}`,
 	};
-	$("#fromPhpPage").val(JSON.stringify(phpPageData));
-	$("#fromPhpLocale").val(JSON.stringify(phpLocaleData));
+	let fromPhpPageValue = JSON.stringify(phpPageData);
+	$("#fromPhpPage").val(fromPhpPageValue);
+	let fromPhpLocaleValue = JSON.stringify(phpLocaleData)
+	$("#fromPhpLocale").val(fromPhpLocaleValue);
+	phpPageData = undefined;
+	phpLocaleData = undefined;
+	setPageData = undefined;
+	}
+	setTimeout(setPageData, 100);
 </script>
-<input type="hidden" id="fromPhpPage">
-<input type="hidden" id="fromPhpLocale">
 <div id="frame">
 	<div id="sidepanel">
 		<div id="profile">

@@ -19,9 +19,8 @@
       #frame {
         width: 100%;
         min-width: 360px;
-        height: 91vh;
+        height: 93vh;
         min-height: 300px;
-        max-height: 720px;
         background: #E6EAEA;
       }
       @media screen and (max-width: 360px) {

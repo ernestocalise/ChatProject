@@ -2,12 +2,6 @@ import {ajaxCall} from "./../ajaxCalls.js";
 import {global} from "./../globalFunctions.js"
 var chatProject = chatProject || {};
 
-//Reading data from Laravel
-chatProject.fromPhpPage = JSON.parse($("#fromPhpPage").val());
-$("#fromPhpPage").remove();
-chatProject.texts = {}
-chatProject.texts = JSON.parse($("#fromPhpLocale").val());
-//$("#fromPhpLocale").remove();
 //Setting up chatPage
 chatProject.ajaxCall = ajaxCall().chat;
 chatProject.fh = global();
@@ -101,7 +95,19 @@ chatProject.chatPage = (function (me) {
             }
         }
     };
-    var _initialize = function(){
+    var _texts = {}
+    var _fromPhpPage = {}
+    var _readPhpPageData = function() {
+        _fromPhpPage = JSON.parse($("#fromPhpPage").val());
+        console.log($("#fromPhpLocale").val());
+        _texts = JSON.parse($("#fromPhpLocale").val());
+        $("#fromPhpPage").remove();
+        $("#fromPhpLocale").remove();
+    }
+    var _initialize = async function(){
+        await chatProject.fh.time.sleep(500);
+        _readPhpPageData();
+        console.log(_fromPhpPage, _texts);
         _getChats();
         _widgets.chatBox.txtMessage.keypress(function(e) {
             // Enter pressed?
@@ -110,8 +116,7 @@ chatProject.chatPage = (function (me) {
             }
         });
         $(_widgets.sideBar.contactContainer.window).css("display", "none");
-        console.warn(chatProject.fromPhpPage);
-        _setStatusImage(chatProject.fromPhpPage.initialUserStatus);
+        _setStatusImage(_fromPhpPage.initialUserStatus);
         setTimeout(_checkChatChanged, _timeouts.checkChatChanged);
         setTimeout(_checkChatCount, _timeouts.checkChatCount);
         //Bindings
@@ -229,7 +234,7 @@ chatProject.chatPage = (function (me) {
             _arrCurrentChats[_chatIndex].messageId = data.messages[data.messages.length-1].messageId;
             $(_selectors.sideBar.chatContainer.singleChatName(chatId)).html(data.chatName);
             const userNameFirstLetters = data.messages[data.messages.length-1].sent_from_user 
-            ? chatProject.texts["You"] 
+            ? _texts["You"] 
             : data.messages[data.messages.length-1].sender.split(' ')
                 .map(word => word.charAt(0))
                 .join('');
@@ -296,7 +301,7 @@ chatProject.chatPage = (function (me) {
 
     //Graphical function
     var _addChatToSidebar = function(chatId, chatName, lastMessage, lastMessageSender, sentFromUser, messageId, partecipants) {
-        const _firstLetters = sentFromUser ? chatProject.texts["You"] : lastMessageSender.split(' ')
+        const _firstLetters = sentFromUser ? _texts["You"] : lastMessageSender.split(' ')
         .map(word => word.charAt(0))
         .join('');
         _widgets.sideBar.chatContainer.window.append(_createSidebarChatItem(chatId, chatName, _firstLetters, lastMessage));
@@ -315,8 +320,8 @@ chatProject.chatPage = (function (me) {
                     _actualViewers+=", ";
                 _actualViewers+=participant.user_name;
             }
-            if(!_viewers.includes(chatProject.fromPhpPage.personalUserId)){
-                _viewers.push(chatProject.fromPhpPage.personalUserId);
+            if(!_viewers.includes(_fromPhpPage.personalUserId)){
+                _viewers.push(_fromPhpPage.personalUserId);
                 chatProject.ajaxCall.setVisualizzation(message.messageId);
             }
             if($(_selectors.chatBox.singleMessageById(message.messageId)).length)
@@ -341,12 +346,12 @@ chatProject.chatPage = (function (me) {
     var _showSidebarChatContainer = function() {
         _widgets.sideBar.chatContainer.window.css("display", "initial");
         _widgets.sideBar.contactContainer.window.css("display", "none");
-        _widgets.sideBar.addContactButton.text.html(chatProject.texts["show_contact"]);
+        _widgets.sideBar.addContactButton.text.html(_texts["show_contact"]);
     }
     var _showSidebarContactContainer = function() {
         _widgets.sideBar.chatContainer.window.css("display", "none");
         _widgets.sideBar.contactContainer.window.css("display", "initial");
-        _widgets.sideBar.addContactButton.text.html(chatProject.texts["show_chats"]);
+        _widgets.sideBar.addContactButton.text.html(_texts["show_chats"]);
         _reloadAllContactsStatuses();
     }
     var _hideSidebarStatusBox = function() {
@@ -440,19 +445,19 @@ chatProject.chatPage = (function (me) {
         statusCode = Number(statusCode);
         switch(statusCode) {
             case 0:
-                return chatProject.texts["status-online"];
+                return _texts["status-online"];
             case 1:
-                return chatProject.texts["status-away"];
+                return _texts["status-away"];
             case 2:
-                return chatProject.texts["status-call"];
+                return _texts["status-call"];
             case 3:
-                return chatProject.texts["status-busy"];
+                return _texts["status-busy"];
             case 4:
-                return chatProject.texts["status-invisible"];
+                return _texts["status-invisible"];
             case -1:
-                return chatProject.texts["status-offline"];
+                return _texts["status-offline"];
             default:
-                return chatProject.texts["status-offline"];
+                return _texts["status-offline"];
         }
     }
     var _getStatusClass = function(statusCode) {
