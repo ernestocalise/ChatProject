@@ -14,14 +14,20 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+//SetLocale
+Route::get('/locale/{lang}', [ProfileController::class, "setLocale"])->name('locale');  
 
+//Index Page
 Route::get('/', function () {
     return view('welcome');
 });
 
+//Dashboard related
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+
 
 //Profile Functions
 Route::middleware('auth')->group(function () {
@@ -32,6 +38,8 @@ Route::middleware('auth')->group(function () {
     //Show profile functions
         Route::get('/profile/{profileId}', [ProfileController::class, 'show']);
 });
+
+//Chat Application
 if(config("application-cluster.chat_enabled")) {
     //Status Functions
     Route::middleware("auth")->group(function() {
@@ -54,6 +62,7 @@ if(config("application-cluster.chat_enabled")) {
         Route::post('/chats/addAttachment', [ChatController::class, 'uploadFile']);
         Route::get('/chats/setVisualizzation/{messageId}', [ChatController::class, "setVisualizzation"]);
     }); 
-}       
-//Profile functions
+}
+
+//Auth Routes
 require __DIR__.'/auth.php';

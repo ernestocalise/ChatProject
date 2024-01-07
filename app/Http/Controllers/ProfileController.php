@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
 class ProfileController extends Controller
 {
     /**
@@ -70,5 +71,14 @@ class ProfileController extends Controller
     }
     public function restoreStatus() {
         return auth()->user()->restoreStatus();
+    }
+    public function setLocale($locale)
+    {
+        $supportedLanguaged = ["en", "it"];
+        if(in_array($locale, $supportedLanguaged)){
+            App::setLocale($locale);
+            Session::put("locale", $locale);
+        }
+        return redirect()->back();
     }
 }

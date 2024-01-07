@@ -78,4 +78,17 @@ class User extends Authenticatable
     function restoreStatus() {
         Cache::forget('user-status' . $this->id);
     }
+    protected static function boot() {
+        parent::boot();
+        static::created(function($user) {
+            if($user->name != "SYSTEM"){
+                $user->profile()->create([
+                    "title" => $user->name
+                ]);
+            }
+        });
+    }
+    function profile() {
+        return $this->hasOne(Profile::class);
+    }
 }
