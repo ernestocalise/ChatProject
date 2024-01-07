@@ -72,13 +72,19 @@ class ProfileController extends Controller
     public function restoreStatus() {
         return auth()->user()->restoreStatus();
     }
-    public function setLocale($locale)
+    public function setLocale(Request $request)
     {
+        $data = $request->validate([
+            "locale" => "required"
+        ]);
+        $locale = $data["locale"];
         $supportedLanguaged = ["en", "it"];
         if(in_array($locale, $supportedLanguaged)){
             App::setLocale($locale);
             Session::put("locale", $locale);
+            auth()->user()->locale = $locale;
+            auth()->user()->save();
         }
-        return redirect()->back();
+        return back()->with('status', 'locale-updated');
     }
 }

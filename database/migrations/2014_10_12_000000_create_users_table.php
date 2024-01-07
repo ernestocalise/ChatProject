@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->timestamp('last_seen')->nullable();
+            $table->string("locale")->default(config("app.locale"));
             $table->rememberToken();
             $table->timestamps();
         });

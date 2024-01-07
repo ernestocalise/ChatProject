@@ -26,8 +26,17 @@ class UserActivity
             Cache::put('user-online' . Auth::user()->id, true, $expires_after);
         }
         //To check for Locale
-        if(Session::get("locale") == null)
-            Session::put("locale", config("app.locale"));
+        if(Session::get("locale") == null){
+            if(Auth::check()){
+                $userLocale = Auth::user()->locale;
+                if($userLocale != NULL)
+                    Session::put("locale", $userLocale);
+                else
+                    Session::put("locale", config("app.locale"));
+            }
+            else
+                Session::put("locale", config("app.locale"));
+        }
         App::setLocale(Session::get("locale"));
         return $next($request);
     }

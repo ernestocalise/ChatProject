@@ -83,8 +83,8 @@ return [
     |
     */
 
-    'locale' => 'en',
-
+    'locale' => env("APP_LOCALE", "en"),
+    'supported_locale' => explode("|", env("APP_SUPPORTED_LOCALE", "EN")), 
     /*
     |--------------------------------------------------------------------------
     | Application Fallback Locale

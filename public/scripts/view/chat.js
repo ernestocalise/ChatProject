@@ -97,13 +97,6 @@ chatProject.chatPage = (function (me) {
     };
     var _texts = {}
     var _fromPhpPage = {}
-    var _readPhpPageData = function() {
-        _fromPhpPage = JSON.parse($("#fromPhpPage").val());
-        console.log($("#fromPhpLocale").val());
-        _texts = JSON.parse($("#fromPhpLocale").val());
-        $("#fromPhpPage").remove();
-        $("#fromPhpLocale").remove();
-    }
     var _initialize = async function(){
         await chatProject.fh.time.sleep(500);
         _readPhpPageData();
@@ -147,7 +140,13 @@ chatProject.chatPage = (function (me) {
         });
         _widgets.chatBox.btnSendMessage.on("click", _sendMessage);
     };
-
+    var _readPhpPageData = function() {
+        _fromPhpPage = JSON.parse($("#fromPhpPage").val());
+        console.log($("#fromPhpLocale").val());
+        _texts = JSON.parse($("#fromPhpLocale").val());
+        $("#fromPhpPage").remove();
+        $("#fromPhpLocale").remove();
+    }
     //Logical function
     var _getMessages = function(chatId) {
         _activeChatId = chatId;

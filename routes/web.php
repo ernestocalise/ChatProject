@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 //SetLocale
-Route::get('/locale/{lang}', [ProfileController::class, "setLocale"])->name('locale');  
+Route::post('/profile/setLocale', [ProfileController::class, "setLocale"])->name('setLocale');  
 
 //Index Page
 Route::get('/', function () {
