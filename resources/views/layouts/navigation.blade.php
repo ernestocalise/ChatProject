@@ -19,7 +19,7 @@
                         {{ __('chat.chat') }}
                     </x-nav-link>
                     <x-nav-link :href="route('email')" :active="request()->routeIs('email')">
-                        {{ __('email.email') }}
+                        {{ __('emails.email') }}
                     </x-nav-link>
                 </div>
             </div>

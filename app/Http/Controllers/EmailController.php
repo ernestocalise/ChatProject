@@ -82,7 +82,6 @@ class EmailController extends Controller
                     //add each parent key, this is what we need
                     $path_element = $iter->getSubIterator( $i )->key();
                     $subtype = $iter->getSubIterator($i)->getArrayCopy();
-                    //if($subtype == "CALENDAR") return;
                     if ( is_numeric( $path_element ) ) { // if it's not numeric, we don't need it.
                         array_unshift( $keys, ( $path_element + 1 ) );
                     }
@@ -162,7 +161,6 @@ class EmailController extends Controller
     }
     
     public function runTest($imap_connection, $email_number, $iterator) {
-      
         $structure            = imap_fetchstructure( $imap_connection, $email_number );
         $headerInfo = imap_headerinfo($imap_connection, $email_number);
         $structure_path       = $this->extract_body_part_path( $structure ); // second parameter is by default set to HTML, you can search anything else also ( PLAIN, HTML, MIXED ... )

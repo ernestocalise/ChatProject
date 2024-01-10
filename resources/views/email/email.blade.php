@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="chat.css">
+<link rel="stylesheet" href="email.css">
 <x-app-layout>
 <div class="csrf-container">
 @csrf
@@ -53,6 +53,7 @@
 		<div id="contacts">
 			<ul class="list-unstyled" id="emailContainer">
 			</ul>
+			<ul class="list-unstyled" id="folderContainer"></ul>
             <ul class="list-unstyled" id="contactContainer">
                 @foreach($users as $user)
                     <li class="contact" id="{{$user->id}}">
@@ -70,8 +71,9 @@
             </ul>
 		</div>
 		<div id="bottom-bar">
-			<button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Contatti</span></button>
-			<button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+			<button id="btnShowFolders"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Folders</span></button>
+			<button id="btnShowEmails"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Mails</span></button>
+			<button id="btnShowContacts"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Contacts</span></button>
 		</div>
 	</div>
 	<div class="content">

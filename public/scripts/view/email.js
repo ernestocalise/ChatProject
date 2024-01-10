@@ -8,9 +8,9 @@ chatProject.fh = global();
 chatProject.emailPage = (function (me) {
     var _activeChatId = 0;
     var _arrCurrentChats = [];
+    var _arrCurrentMails = [];
     var _timeouts = {
-        checkChatChanged: 1000,
-        checkChatCount: 5000
+
     };
     var _selectors = {
         csrf_token: 'meta[name=csrf-token]',
@@ -29,11 +29,14 @@ chatProject.emailPage = (function (me) {
             },
             emailContainer: {
                 window: "#emailContainer",
-                singleFolderById: (folderId) => {return `${_selectors.sideBar.emailContainer.window}>#folder-${folderId}`},
                 singleEmailById: (emailId) => {return `${_selectors.sideBar.emailContainer.window}>#email-${emailId}`},
                 emailDescriptorById: (emailId) => {return `#emailDescriptor-${emailId}`},
                 singleChatName: (emailId) => {return `${_selectors.sideBar.emailContainer.emailDescriptorById(emailId)}>.name`},
                 singleChatPreview: (emailId) => {return `${_selectors.sideBar.emailContainer.emailDescriptorById(emailId)}>.preview`}
+            },
+            folderContainer: {
+                window:"#folderContainer",
+                singleFolderById: (folderId) => {return `${_selectors.sideBar.folderContainer.window}>#folder-${folderId}`},
             },
             showContactButton: {
                 button: "#showContact",
@@ -71,6 +74,9 @@ chatProject.emailPage = (function (me) {
             emailContainer: {
                 window: $(_selectors.sideBar.emailContainer.window)
             },
+            folderContainer: {
+                window:$(_selectors.sideBar.folderContainer.window)
+            },
             showContactButton: {
                 button: $(_selectors.sideBar.showContactButton.button),
                 text: $(_selectors.sideBar.showContactButton.text())
@@ -95,6 +101,7 @@ chatProject.emailPage = (function (me) {
         await chatProject.fh.time.sleep(500);
         _readPhpPageData();
         _getFolders();
+        $("#bottom-bar>button").on("click", _sidebarButtonClick);
     };
     //Logical function
     var _readPhpPageData = function() {
@@ -127,23 +134,38 @@ chatProject.emailPage = (function (me) {
     }
     var _getMailbox = function(folderNum) {
         var _successCallback = function(data){
-            console.log(data);
+            data.forEach(x => {
+                _arrCurrentMails.push(x);
+                _addEmailToSidebar(x);
+            })
         }
         chatProject.ajaxCall.getMailBox(folderNum, _successCallback);
     }
     //Graphical function
+    var _sidebarButtonClick = function() {
+        let arrSwitcher = ["btnShowFolders","btnShowEmails", "btnShowContacts"]
+        let arrReference = ["folderContainer", "emailContainer","contactContainer"]
+        let activate = arrSwitcher.indexOf($(this)[0].id);
+        arrReference.forEach(
+            singleReference => $("#"+singleReference).hide()
+        );
+        $("#"+arrReference[activate]).show();
+    }
     var _addEmailToSidebar = function(emailObject, putOnTop = false) {
-        _widgets.sideBar.chatContainer.window.append(_createSidebarEmailItem(emailObject));
+        _widgets.sideBar.emailContainer.window.append(_createSidebarEmailItem(emailObject));
         //_arrCurrentChats.push({chatId: chatId, messageId: messageId, partecipants: partecipants});
     }
     var _drawFolders = function() {
+        let isFirst = true;
         _folders.forEach(folder => {
-            _widgets.sideBar.emailContainer.window.append(_createSidebarFolderItem(folder));
-            console.log(_selectors.sideBar.emailContainer.singleFolderById(folder.index));
-            $(_selectors.sideBar.emailContainer.singleFolderById(folder.index)).bind("click", function() {
-                console.warn("start")
+            _widgets.sideBar.folderContainer.window.append(_createSidebarFolderItem(folder));
+            $(_selectors.sideBar.folderContainer.singleFolderById(folder.index)).bind("click", function() {
                 _getMailbox(folder.index);
             });
+            if(isFirst){
+                $(_selectors.sideBar.folderContainer.singleFolderById(folder.index)).click();
+                isFirst = !isFirst;
+            }
         });
     }
     //Generative function
@@ -158,14 +180,12 @@ chatProject.emailPage = (function (me) {
     }
 
     var _createSidebarEmailItem = function(emailObject) {
-        let senderName = emailObject.from; //= substr(emailObject.from, 0, strpos(emailObject.from, "<"));
-
         return `<li class="contact" id="email-${emailObject.uid}">
                     <div class="wrap">
-                        <img src="https://ui-avatars.com/api/?name=${senderName}" alt="" />
                         <div class="meta" id="emailDescriptor-${emailObject.uid}">
-                            <p class="name">${emailObject.subject}</p>
-                            <p class="preview">${emailObject.date}</p>
+                            <p class="preview">Da: ${emailObject.header.senderaddress}
+                            <p class="name">${emailObject.header.subject}</p>
+                            <p class="preview">${emailObject.message.substring(0,50)}</p>
                             </div>
                     </div>
                 </li>`;
