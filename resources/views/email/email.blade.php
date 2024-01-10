@@ -14,7 +14,7 @@
 	phpPageData = {
 		personalUserId: {{auth()->user()->id}},
 		initialUserStatus: {{auth()->user()->getStatus()}},
-
+		hostname: `{{$hostname}}`
 	};
 	phpLocaleData = {
 		"show_contact": `{{__("chat.show_contact")}}`,
@@ -43,24 +43,7 @@
 			<div class="wrap">
 				<img id="profile-img" src="{{auth()->user()->profileImage()}}" class="" alt="" />
 				<p>{{auth()->user()->name}}</p>
-				<i class="fa fa-chevron-down expand-button" id="#btnStatus"></i>
-				<div id="status-options">
-					<ul>
-						<li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
-						<li id="status-away" ><span class="status-circle"></span> <p>Away</p></li>
-						<li id="status-busy" ><span class="status-circle"></span> <p>Busy</p></li>
-						<li id="status-invisible" ><span class="status-circle"></span> <p>Invisible</p></li>
-						<li id="status-reset"><span class="status-circle"></span> <p>Reset</p></li>
-					</ul>
-				</div>
-				<div id="expanded">
-					<label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
-					<input name="twitter" type="text" value="mikeross" />
-					<label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
-					<input name="twitter" type="text" value="ross81" />
-					<label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
-					<input name="twitter" type="text" value="mike.ross" />
-				</div>
+				<span>&lt;{{auth()->user()->profile->EmailConfiguration->getUsername()}}&gt;</span>
 			</div>
 		</div>
 		<div id="search">
@@ -68,7 +51,7 @@
 			<input type="text" placeholder="Search contacts..." />
 		</div>
 		<div id="contacts">
-			<ul class="list-unstyled" id="chatContainer">
+			<ul class="list-unstyled" id="emailContainer">
 			</ul>
             <ul class="list-unstyled" id="contactContainer">
                 @foreach($users as $user)
@@ -78,7 +61,7 @@
                             <img src="https://ui-avatars.com/api/?name={{$user->name}}" alt="" />
                             <div class="meta" id="{{$user->id}}">
                                 <p class="name">{{$user->name}}</p>
-                                <p class="preview">Programmer</p>
+                                <p class="preview">{{$user->profile->EmailConfiguration ?? $user->email}}</p>
                             </div>
                         </div>
                     </li>
@@ -101,15 +84,14 @@
 			<i class="fa-solid fa-bars-staggered"></i>
 			</div>
 		</div>
-		<div class="messages" id="messageTarget">
-			<ul>
-			</ul>
+		<div class="messages" id="emailTarget">
+			
 		</div>
 		<div class="message-input">
 			<div class="wrap">
 			<input type="text" placeholder="Write your message..." id="txtMessage"/>
 			<i class="fa fa-paperclip attachment" id="btnFileUpload" aria-hidden="true"></i>
-			<button class="submit" id="btnSendMessage"><i class="fa fa-paper-plane" aria-hidden="true" ></i></button>
+			<button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 			</div>
 		</div>
 	</div>
@@ -119,4 +101,4 @@
         <input id="iptFileUpload" type="file" accept="image/*, .zip, .rar, .pdf, .doc, .txt" name="iptFileUpload">
     </form>
 
-<script type="module" src="/scripts/view/chat.js"></script>
+<script type="module" src="/scripts/view/email.js"></script>

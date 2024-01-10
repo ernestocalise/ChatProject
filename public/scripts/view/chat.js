@@ -87,7 +87,7 @@ chatProject.chatPage = (function (me) {
             txtMessage: $(_selectors.chatBox.txtMessage),
             btnFileUpload: $(_selectors.chatBox.btnFileUpload),
             btnSendMessage: $(_selectors.chatBox.btnSendMessage),
-            iptFileUploader: $(_selectors.chatBox.iptFileUploader),
+            iptFileUploader: $(_selectors.chatBox.iptFileUploader)[0],
             messageTarget: $(_selectors.chatBox.messageTarget),
             contactProfile: {
                 image: $(_selectors.chatBox.contactProfile.image),
@@ -116,9 +116,7 @@ chatProject.chatPage = (function (me) {
         _widgets.sideBar.searchBar.on('input',function() {
             _findChat(_widgets.sideBar.searchBar.val());
         });
-        _widgets.chatBox.iptFileUploader.on("change",function() {
-            _iptFileUpload_change(data);
-        });
+        $(_selectors.chatBox.iptFileUploader).on("change",_iptFileUpload_change);
         _widgets.sideBar.profile.status.statusButton.on("click", _btnStatus_click);
         _widgets.sideBar.profile.status.statusOptions.each(function(index) {
             $(this).on("click", function() {
@@ -192,7 +190,7 @@ chatProject.chatPage = (function (me) {
         chatProject.ajaxCall.getChats(_successCallback);
     };
     var _uploadFile = function() {
-        var formData = new formData();
+        var formData = new FormData();
         formData.append("file", _widgets.chatBox.iptFileUploader.files[0]);
         formData.append("_token", _widgets.csrf_token.attr("content"));
         formData.append("chatId", _activeChatId);

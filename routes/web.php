@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,5 +65,11 @@ if(config("application-cluster.chat_enabled")) {
     }); 
 }
 
+//Email Application
+Route::middleware("auth")->group(function() {
+    Route::get("/email", [EmailController::class, "index"])->name("email");
+    Route::get("/getFolders", [EmailController::class, "getFolders"]);
+    Route::get("/getMailbox/{FolderId}/{orderBy?}/{startPosition?}/{endPosition?}",[EmailController::class, "getMailbox"]);
+});
 //Auth Routes
 require __DIR__.'/auth.php';

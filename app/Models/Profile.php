@@ -11,4 +11,9 @@ class Profile extends Model
     function user() {
         return $this->belongsTo(User::class);
     }
+
+    public function EmailConfiguration() {
+        return $this->hasOne(email_configuration::class);
+    }
+
 }

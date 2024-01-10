@@ -83,6 +83,14 @@ export function ajaxCall() {
     var _getStatus = function(userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/user/getStatus/${userId}`, successCallback, errorCallback);
     };
+    var _getFolders = function(successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/getFolders`, successCallback, errorCallback);
+    }
+    var _getMailbox = function(mailboxId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/getMailbox/${mailboxId}`, successCallback, errorCallback)
+    }
+
+
     return {
         chat: {
             setVisualizzation : _setVisualizzation,
@@ -97,6 +105,11 @@ export function ajaxCall() {
             getStatus: _getStatus,
             setStatus: _setStatus,
             restoreStatus: _restoreStatus
+        },
+        email: {
+            getFolders: _getFolders,
+            getMailBox: _getMailbox
         }
     };
+    
 }

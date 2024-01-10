@@ -96,7 +96,9 @@ class ChatController extends Controller
         $data = $request->validate(
             [
                 "chatId" => "numeric|required",
-                "file" => File::types(["image/*",".zip",".rar",".pdf",".doc",".txt"])
+                "file" => \Illuminate\Validation\Rules\File::types([
+                    "apng","avif","gif","jpg","jpeg","jfif","pjpeg", "pjp","png","svg","webp","bmp","ico","cur","tif","tiff",
+                    "zip","rar","pdf","doc","txt"])
                 ->max("25mb")
             ]
         );
@@ -111,7 +113,7 @@ class ChatController extends Controller
             if(in_array($fileMimeType, $imageMimeTypes))
             $isImage = true;
         //Check if chatfolder exists or create ut
-        File::isDirectory($destinationPath) or \Illuminate\Validation\Rules\File::makeDirectory($destinationPath, 0777, true, true);
+        File::isDirectory($destinationPath) or File::makeDirectory($destinationPath, 0777, true, true);
         $filePath = "{$destinationPath}/{$fileName}";
         $iterator = 1;
         $tempFilePath = $filePath;
