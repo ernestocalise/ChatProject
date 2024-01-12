@@ -1,5 +1,5 @@
-import {ajaxCall} from "./../ajaxCalls.js";
-import {global} from "./../globalFunctions.js"
+import {ajaxCall} from "./../common/ajaxCalls.js";
+import {global} from "./../common/globalFunctions.js";
 var chatProject = chatProject || {};
 
 //Setting up chatPage
@@ -97,6 +97,11 @@ chatProject.chatPage = (function (me) {
     };
     var _texts = {}
     var _fromPhpPage = {}
+    var _timers = {
+        tmrCheckChatChanged: null,
+        tmrCheckChatCount: null,
+        tmrUploadFile: null
+    };
     var _initialize = async function(){
         await chatProject.fh.time.sleep(500);
         _readPhpPageData();
@@ -110,8 +115,10 @@ chatProject.chatPage = (function (me) {
         });
         $(_widgets.sideBar.contactContainer.window).css("display", "none");
         _setStatusImage(_fromPhpPage.initialUserStatus);
-        setTimeout(_checkChatChanged, _timeouts.checkChatChanged);
-        setTimeout(_checkChatCount, _timeouts.checkChatCount);
+        _timers.tmrCheckChatChanged = chatProject.fh.time.timer("_tmrCheckChatChanged", _checkChatChanged, _timeouts.checkChatChanged, false);
+        _timers.tmrCheckChatCount = chatProject.fh.time.timer("_checkChatCount", _checkChatCount, _timeouts.checkChatCount, false);
+        _timers.tmrCheckChatChanged.start();
+        _timers.tmrCheckChatCount.start();
         //Bindings
         _widgets.sideBar.searchBar.on('input',function() {
             _findChat(_widgets.sideBar.searchBar.val());
@@ -207,10 +214,8 @@ chatProject.chatPage = (function (me) {
                 if(data.chatChanged) {
                     _updateChat(singleChat.chatId, singleChat.messageId);
                 }
-                setTimeout(_checkChatChanged, _timeouts.checkChatChanged);
             };
             let _errorCallback = function() {
-                setTimeout(_checkChatChanged, _timeouts.checkChatChanged);
             };
             chatProject.ajaxCall.checkChatChanged(_data, _successCallback, _errorCallback);
         });
@@ -277,12 +282,9 @@ chatProject.chatPage = (function (me) {
             if(data[0].ChatCount > _arrCurrentChats.length){
                 _widgets.sideBar.chatContainer.window.html("")
                 _getChats();
-                setTimeout(_checkChatCount, _timeouts.checkChatCount);
-            } else
-                setTimeout(_checkChatCount, _timeouts.checkChatCount);
+            }
         };
         var _errorCallback = function() {
-            setTimeout(_checkChatCount, _timeouts.checkChatCount);
         };
         chatProject.ajaxCall.checkChatCount(_successCallback, _errorCallback);
     };

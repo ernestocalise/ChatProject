@@ -138,6 +138,7 @@ chatProject.emailPage = (function (me) {
             })
         }
         chatProject.ajaxCall.getMailBox(folderNum, _successCallback);
+        
     }
     //Graphical function
     var _sidebarButtonClick = function() {

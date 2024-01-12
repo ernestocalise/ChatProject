@@ -1,3 +1,4 @@
+import { Timer } from "./classes/timer.js";
 export function global() {
     //STRING
     var _isStringEmpty = function(str) {
@@ -16,7 +17,9 @@ export function global() {
 
     //TIME
     const _sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-
+    const _createTimer = function(name = "", callback,interval = 10, executeOnce = false) {
+        return new Timer(name, callback, interval, executeOnce);
+    };
     var _textFuncions = {
         isStringEmpty: _isStringEmpty
     };
@@ -25,7 +28,8 @@ export function global() {
         hideLoader: _hideLoader
     };
     var _time = {
-        sleep: _sleep
+        sleep: _sleep,
+        timer: _createTimer
     }
     return {
         string: _textFuncions,
