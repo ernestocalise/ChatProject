@@ -113,7 +113,6 @@ chatProject.emailPage = (function (me) {
     }
     var _getFolders = function() {
         var successCallback = function(data) {
-            console.warn(data);
             data.forEach((folder, index) => {
                 if(folder.attributes!=64){
                     let INBOX_TAG = "INBOX"
@@ -128,9 +127,8 @@ chatProject.emailPage = (function (me) {
                 }
             });
             _drawFolders();
-            console.warn(_folders);
         }
-        chatProject.ajaxCall.getFolders(successCallback)
+        chatProject.ajaxCall.getFolders(successCallback);
     }
     var _getMailbox = function(folderNum) {
         var _successCallback = function(data){
@@ -153,6 +151,10 @@ chatProject.emailPage = (function (me) {
     }
     var _addEmailToSidebar = function(emailObject, putOnTop = false) {
         _widgets.sideBar.emailContainer.window.append(_createSidebarEmailItem(emailObject));
+        console.log(_selectors.sideBar.emailContainer.singleEmailById(emailObject.messageNumber));
+        $(_selectors.sideBar.emailContainer.singleEmailById(emailObject.messageNumber)).bind("click", function(event){
+            _showEmail(emailObject.messageNumber);
+        });
         //_arrCurrentChats.push({chatId: chatId, messageId: messageId, partecipants: partecipants});
     }
     var _drawFolders = function() {
@@ -180,9 +182,9 @@ chatProject.emailPage = (function (me) {
     }
 
     var _createSidebarEmailItem = function(emailObject) {
-        return `<li class="contact" id="email-${emailObject.uid}">
+        return `<li class="contact" id="email-${emailObject.messageNumber}">
                     <div class="wrap">
-                        <div class="meta" id="emailDescriptor-${emailObject.uid}">
+                        <div class="meta" id="emailDescriptor-${emailObject.messageNumber}">
                             <p class="preview">Da: ${emailObject.header.senderaddress}
                             <p class="name">${emailObject.header.subject}</p>
                             <p class="preview">${emailObject.message.substring(0,50)}</p>
