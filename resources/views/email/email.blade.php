@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="email.css">
+<link rel="stylesheet" href="css/email.css">
 <x-app-layout>
 <div class="csrf-container">
 @csrf
@@ -77,14 +77,10 @@
 		</div>
 	</div>
 	<div class="content">
-		<div class="contact-profile">
-			<img src="" alt="" />
-			<p></p>
-			<div class="social-media">
-			<i class="fa-solid fa-phone"></i>
-			<i class="fa-solid fa-video"></i>
-			<i class="fa-solid fa-bars-staggered"></i>
-			</div>
+		<div id="email-object" class="contact-profile">
+			<p>Ultima Release LC</p>
+			<span id="emailFrom"></br>Da: <a href="mailto:e.calise@3em.it">Ernesto Calise <e.calise@3em.it></a></span>
+			<span id="emailTo"></br>A: <a href="mailto:Andrea.Carfizzi@emeal.nttdata.com">Andrea Carfizzi <Andrea.Carfizzi@emeal.nttdata.com></a></span>
 		</div>
 		<div class="messages" id="emailTarget">
 			

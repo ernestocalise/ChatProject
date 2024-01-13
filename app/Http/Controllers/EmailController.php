@@ -165,6 +165,7 @@ class EmailController extends Controller
         $headerInfo = imap_headerinfo($imap_connection, $email_number);
         $structure_path       = $this->extract_body_part_path( $structure ); // second parameter is by default set to HTML, you can search anything else also ( PLAIN, HTML, MIXED ... )
         $image_structure_path = $this->extract_body_part_path( $structure, "PNG");
+        $headerInfo->subject = mb_convert_encoding(quoted_printable_decode($headerInfo->subject), 'UTF-8', 'UTF-8');
         if($structure_path == null) {
             $content = $this->your_decoding_method(imap_fetchbody( $imap_connection, $email_number, 1.0), $structure->encoding);
             if($content == null || $content == "") {

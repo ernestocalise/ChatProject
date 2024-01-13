@@ -1,5 +1,5 @@
-import {ajaxCall} from "./../ajaxCalls.js";
-import {global} from "./../globalFunctions.js"
+import {ajaxCall} from "./../common/ajaxCalls.js";
+import {global} from "./../common/globalFunctions.js"
 var chatProject = chatProject || {};
 
 //Setting up chatPage
@@ -150,11 +150,38 @@ chatProject.emailPage = (function (me) {
         );
         $("#"+arrReference[activate]).show();
     }
+    var _buildMailboxAddressBar = function(array, separator = "") {
+        let outString = "";
+        array.forEach(x => {
+            outString = (outString == "")
+            ? `${outString}<a href="mailto:${x.mailbox}@${x.host}">${x.mailbox}@${x.host}</a>`
+            : `${separator}${outString}<a href="mailto:${x.mailbox}@${x.host}">${x.mailbox}@${x.host}</a>`;
+        });
+        return outString;  
+    }
+    var _showEmail = function(emailObject) {
+        console.log("#SHOW EMAIL PROCESSING: ",emailObject, emailObject.header);
+        
+        
+        $("#emailFrom").html(`Da: ${_buildMailboxAddressBar(emailObject.header.from, " || ")}`);
+
+        $("#emailTo").html(`A: ${_buildMailboxAddressBar(emailObject.header.to," || ")}`);
+        $("#email-object>p").html(emailObject.header.subject);
+        let attachmentText = "";
+          if(Array.isArray(emailObject.attachments)){
+            emailObject.attachments.forEach(attachment => {
+                attachmentText+=`[<a href="/storage${attachment}">${attachment}</a>]`;
+            });
+        }
+        $("#emailTarget").html(
+            `Attachments: [${attachmentText}] </br>
+            ${emailObject.message}`);
+    }
     var _addEmailToSidebar = function(emailObject, putOnTop = false) {
         _widgets.sideBar.emailContainer.window.append(_createSidebarEmailItem(emailObject));
         console.log(_selectors.sideBar.emailContainer.singleEmailById(emailObject.messageNumber));
         $(_selectors.sideBar.emailContainer.singleEmailById(emailObject.messageNumber)).bind("click", function(event){
-            _showEmail(emailObject.messageNumber);
+            _showEmail(emailObject);
         });
         //_arrCurrentChats.push({chatId: chatId, messageId: messageId, partecipants: partecipants});
     }
@@ -194,7 +221,10 @@ chatProject.emailPage = (function (me) {
                 </li>`;
     }
     //String manipulation
+    var _createEmailItem = function(emailObject) {
+        _widgets.main.contactProfile.name.html(emailObject.header.subject);
 
+    }
     //Bindings
     var _showContactButton_click = function() {
         _widgets.sideBar.searchBar.val("");
