@@ -81,6 +81,7 @@
 			<p>Ultima Release LC</p>
 			<span id="emailFrom"></br>Da: <a href="mailto:e.calise@3em.it">Ernesto Calise <e.calise@3em.it></a></span>
 			<span id="emailTo"></br>A: <a href="mailto:Andrea.Carfizzi@emeal.nttdata.com">Andrea Carfizzi <Andrea.Carfizzi@emeal.nttdata.com></a></span>
+			<span id="emailCC"></br>CC: <a href="mailto:Andrea.Carfizzi@emeal.nttdata.com">Andrea Carfizzi <Andrea.Carfizzi@emeal.nttdata.com></a></span>
 		</div>
 		<div class="messages" id="emailTarget">
 			
