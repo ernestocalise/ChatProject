@@ -13,7 +13,9 @@ export function global() {
     var _hideLoader = function() {
         $(".loader").css("display", "none");
     };
-
+    var _playAudioIncomingCall = function() {
+        $("#chatRingSound")[0].play();
+    }
 
     //TIME
     const _sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
@@ -25,7 +27,8 @@ export function global() {
     };
     var _interface = {
         showLoader: _showLoader,
-        hideLoader: _hideLoader
+        hideLoader: _hideLoader,
+        playAudioIncomingCall: _playAudioIncomingCall
     };
     var _time = {
         sleep: _sleep,

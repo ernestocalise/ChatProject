@@ -37,6 +37,8 @@
                 {{ $slot }}
             </main>
         </div>
+        <audio controls loop autoplay="false" id="chatRingSound">
+            <source src="sounds/call.mp3" type="audio/mp3">
     </body>
     <script>
 

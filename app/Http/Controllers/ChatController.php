@@ -17,6 +17,9 @@ class ChatController extends Controller
         $users = User::all()->except(array(auth()->user()->id, 0));
         return view('chat.index', compact("users"));
     }
+    public function checkIncomingCall() {
+        
+    }
     public function getChatMessages($chatId) {
         $data = validator(compact("chatId"), ["chatId" => "required|numeric"])->validate();
         return Chat::find($data["chatId"])->getChatMessages();
