@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\VideoConferenceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,6 +64,26 @@ if(config("application-cluster.chat_enabled")) {
         Route::post('/chats/addAttachment', [ChatController::class, 'uploadFile']);
         Route::get('/chats/setVisualizzation/{messageId}', [ChatController::class, "setVisualizzation"]);
     }); 
+    //VideoChat Functions
+    Route::middleware('auth')->group(function () {
+        
+        //Webpage
+        Route::get('/conference/show', [VideoConferenceController::class, 'index']);
+        //Creating Conference
+        Route::post('/conference/create', [VideoConferenceController::class, 'CreateConference']);
+        
+        //Creating Call
+        Route::post('/conference/start', [VideoConferenceController::class, 'StartVideoConference']);
+        Route::post('/conference/createCallDocument', [VideoConferenceController::class, 'CreateCallDocument']);
+        Route::post('/conference/insertOfferIceCandidates', [VideoConferenceController::class, 'InsertOfferIceCandidates']);
+        Route::post('/conference/checkAnswerDescriptionChanges', [VideoConferenceController::class, 'CheckAnswerDescriptionChanges']);
+        Route::post('/conference/checkNewAnswerIceCandidates', [VideoConferenceController::class, 'CheckNewAnswerIceCandidates']);
+        //Answering call
+        Route::post('/conference/getOfferDescription', [VideoConferenceController::class, 'GetOfferDescription']);
+        Route::post('/conference/checkNewOfferIceCandidates', [VideoConferenceController::class, 'CheckNewOfferIceCandidates']);
+        Route::post('/conference/insertAnswerIceCandidates', [VideoConferenceController::class, 'InsertAnswerIceCandidates']);
+        Route::post('/conference/setAnswerDescription', [VideoConferenceController::class, 'SetAnswerDescription']);
+    });
 }
 
 //Email Application
