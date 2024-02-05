@@ -8,13 +8,22 @@ use App\Models\VideochatDocument;
 use App\Models\VideoChatOfferIceCandidates;
 use App\Models\VideoChatAnswerIceCandidates;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 class VideoConferenceController extends Controller
 {
+    public static function retriveStunServerConfiguration(){
+        $apiKey =  VideoConferenceController::RetriveMeteredApiKey();
+        $res = Http::get('https://chatapplication.metered.live/api/v1/turn/credentials?apiKey='.$apiKey);
+        return $res->body();
+    }
     public function index () {
         $users = User::all()->except(array(auth()->user()->id, 0));
-         return view("chat.videocall", compact("users"));
+        $stunServerConfiguration = json_encode(VideoConferenceController::retriveStunServerConfiguration());
+         return view("chat.videocall", compact("users", "stunServerConfiguration"));
     }
-
+    public static function RetriveMeteredApiKey() {
+        return config("application-cluster.metered_api_key");
+    }
     public function StartVideoConference (Request $request) {
         $data = $request->validate([
             "userIdCollection" => "string|required"

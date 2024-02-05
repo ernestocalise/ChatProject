@@ -42,7 +42,7 @@ chatProject.videoCall = (function (me) {
 
     //Logical function
     var _initializeVideoStreamObject = function () {
-        _videoStreamObject = new VideoStreamObject(_selectors.inputVideo, _selectors.remoteVideo)
+        _videoStreamObject = new VideoStreamObject(_selectors.inputVideo, _selectors.remoteVideo, _fromPhpPage.stunServerConfiguration);
         _videoStreamObject.csrf_token = $(_selectors.csrf_token).attr("content");
     }
     //Graphical function

@@ -1,7 +1,7 @@
 import { Timer } from "./../timer.js";
 import { ajaxCall } from "../../ajaxCalls.js";
 export class VideoStreamObject {
-    constructor(localVideoSelector, remoteVideoSelector) {
+    constructor(localVideoSelector, remoteVideoSelector, stunServerConfiguration) {
         this.videoConferenceId = 0;
         this.userMedia = {
             webcamStatus: false,
@@ -19,15 +19,7 @@ export class VideoStreamObject {
         this.localVideoObject = document.getElementById(localVideoSelector);
         this.remoteVideoObject = document.getElementById(remoteVideoSelector);
         this.comunicationData = {
-            stunServers: {
-                iceServers: [
-                    {
-                        urls: 'turn:openrelay.metered.ca:80',
-                        username: 'openrelayproject',
-                        credentials: 'openrelayproject'
-                    }
-                ]
-            },
+            stunServers: stunServerConfiguration,
             localIceCandidates: [],
             remoteIceCandidates: [],
             answerDescription: null,

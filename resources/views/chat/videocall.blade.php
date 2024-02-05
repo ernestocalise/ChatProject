@@ -13,7 +13,8 @@
 	function setPageData() {
 	phpPageData = {
 		personalUserId: {{auth()->user()->id}},
-		initialUserStatus: {{auth()->user()->getStatus()}},
+		initialUserStatus: {{auth()->user()->getStatus()}}, 
+		stunServerConfiguration: JSON.parse({!!$stunServerConfiguration!!})
 	};
 	phpLocaleData = {
 		"show_contact": `{{__("chat.show_contact")}}`,
