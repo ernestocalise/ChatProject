@@ -71,6 +71,7 @@ if(config("application-cluster.chat_enabled")) {
         Route::get('/conference/show', [VideoConferenceController::class, 'index']);
         //Creating Conference
         Route::post('/conference/create', [VideoConferenceController::class, 'CreateConference']);
+        Route::post('/conference/CreateSoundCall', [VideoConferenceController::class, 'CreateSoundCall']);
         
         //Creating Call
         Route::post('/conference/start', [VideoConferenceController::class, 'StartVideoConference']);

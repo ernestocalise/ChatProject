@@ -9,6 +9,7 @@ use App\Models\VideoChatOfferIceCandidates;
 use App\Models\VideoChatAnswerIceCandidates;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use App\Models\SoundCall;
 class VideoConferenceController extends Controller
 {
     public static function retriveStunServerConfiguration(){
@@ -39,18 +40,33 @@ class VideoConferenceController extends Controller
             "conferenceId" => $conf->id
          ];
     }
-
+    public function CreateSoundCall(Request $request) {
+        $data = $request->validate([
+            "userIdCollection" => "string|required",
+            "conferenceId" => "numeric|required"
+        ]);
+        $userIdCollection = json_decode($data["userIdCollection"]);
+        $conferenceId = json_decode($data["conferenceId"]);
+        foreach($userIdCollection as $targetId) {
+            $soundCall = new SoundCall();
+            $soundCall->setupCall($conferenceId, auth()->user()->id, $targetId);
+            $soundCall->save();
+        }
+    }
     //Starting a call
     public function CreateCallDocument (Request $request) {
         $data = $request->validate([
             "offerDescription" => "string|required",
-            "conference_id" => "numeric|required"
+            "conference_id" => "numeric|required",
+            "target_id" => "numeric|required"
         ]);
         $offerDescription = $data["offerDescription"];
         $conference_id = $data["conference_id"];
          $doc = new VideochatDocument();
          $doc->offer_candidates = $offerDescription;
          $doc->conference_id = $conference_id;
+         $doc->caller_id = auth()->user()->id;
+         $doc->target_id = $data["targetId"];
          $doc->save();
          return (object)[
             "documentId" => $doc->id,

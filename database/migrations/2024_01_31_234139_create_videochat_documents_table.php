@@ -15,9 +15,13 @@ return new class extends Migration
             $table->id();
             $table->text("offer_candidates")->nullable();
             $table->text("answer_candidates")->nullable();
+            $table->unsignedBigInteger("caller_id");
+            $table->unsignedBigInteger("target_id");
             $table->unsignedBigInteger("conference_id");
             $table->timestamps();
             $table->foreign('conference_id')->references('id')->on('conferences');
+            $table->foreign('caller_id')->references('id')->on('users')->onDelete("cascade");
+            $table->foreign('target_id')->references('id')->on('users')->onDelete("cascade");
         });
     }
 

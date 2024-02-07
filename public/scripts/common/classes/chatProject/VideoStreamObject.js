@@ -1,22 +1,8 @@
 import { Timer } from "./../timer.js";
 import { ajaxCall } from "../../ajaxCalls.js";
 export class VideoStreamObject {
-    constructor(localVideoSelector, remoteVideoSelector, stunServerConfiguration) {
-        this.videoConferenceId = 0;
-        this.userMedia = {
-            webcamStatus: false,
-            audioStatus: false,
-            screenStatus: false,
-            audioOptions: {
-                echoCancellation: true,
-                noiseSuppression: true
-            },
-            audioStream: new MediaStream(),
-            videoStream: new MediaStream()
-        }
-        this.localStream = new MediaStream();
-        this.remoteStream = new MediaStream();
-        this.localVideoObject = document.getElementById(localVideoSelector);
+    constructor(remoteVideoSelector, stunServerConfiguration, callerId, targetId) {
+
         this.remoteVideoObject = document.getElementById(remoteVideoSelector);
         this.comunicationData = {
             stunServers: stunServerConfiguration,
@@ -26,73 +12,19 @@ export class VideoStreamObject {
             callId: 0,
             conferenceId: 0
         },
+        this.callerId = callerId;
+        this.targetId = targetId;
             this.connection = new RTCPeerConnection(this.comunicationData.stunServers);
         this.timers = {
             tmrAnswerDescription: null,
             tmrAnswerCandidate: null,
             tmrOfferCandidate: null
         }
+        this.localStream = new MediaStream();
         this.csrf_token = "";
         this.ajaxCall = ajaxCall();
     }
-    //User Media Management
-    async #setupAudioStream(doBind = true) {
-        this.userMedia.audioStream.getTracks().forEach(track => track.stop());
-        this.userMedia.audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                noiseSuppression: this.userMedia.audioOptions.noiseSuppression,
-                echoCancellation: this.userMedia.audioOptions.echoCancellation
-            }
-        });
-        if (doBind)
-            this.#bindLocalStream();
-    }
-    async #setupWebcam(doBind = true) {
-        this.userMedia.webcamStatus = true;
-        this.userMedia.screenStatus = false;
-        this.userMedia.videoStream.getTracks().forEach(track => track.stop());
-        let webcamStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: this.userMedia.webcamStatus });
-        this.userMedia.videoStream = webcamStream;
-        if (doBind)
-            this.#bindLocalStream();
-    }
-    async #setupScreen(doBind = true) {
-        this.userMedia.webcamStatus = false;
-        this.userMedia.screenStatus = true;
-        let screenStream = await navigator.mediaDevices.getDisplayMedia(
-            {
-                video: {
-                    mediaSource: "screen"
-                }
-            });
-        this.userMedia.videoStream.getTracks().forEach(track => track.stop());
-        this.userMedia.videoStream = screenStream;
-        if (doBind)
-            this.#bindLocalStream();
-    }
-    async #bindLocalStream() {
-        let mixedStream = new MediaStream();
-        this.userMedia.videoStream.getTracks().forEach(videoTrack => mixedStream.addTrack(videoTrack));
-        this.userMedia.audioStream.getTracks().forEach(audioTrack => mixedStream.addTrack(audioTrack));
-        this.localStream = mixedStream;
-        let senders = this.connection.getSenders();
-        senders.forEach(sender => this.connection.removeTrack(sender));
-        this.localStream.getTracks().forEach((track) => {
-            this.connection.addTrack(track, this.localStream);
-        })
-        this.localVideoObject.srcObject = this.localStream;
-    }
-    async initializeUserMedia(isWebcamEnabled = this.userMedia.webcamStatus, isAudioEnabled = this.userMedia.audioStatus, isScreenEnabled = this.userMedia.screenStatus) {
-        if (isAudioEnabled)
-            await this.#setupAudioStream(false);
-        else
-            this.userMedia.audioStream = new MediaStream();
-        if (isWebcamEnabled)
-            await this.#setupWebcam(false);
-        if (isScreenEnabled && !isWebcamEnabled)
-            await this.#setupScreen(false);
-        this.#bindLocalStream();
-    }
+
     async #listenToRemoteStream() {
         this.connection.addEventListener('track', async (event) => {
             this.remoteStream = event.streams;
@@ -100,27 +32,21 @@ export class VideoStreamObject {
         });
     }
     //SetupConference
-    async createConference(userIds) {
-        let videoConferenceData = await this.ajaxCall.videoCall.createConference(
-            {
-                userIds: userIds,
-                '_token': this.csrf_token
-            });
-        this.videoConferenceId = videoConferenceData.conference_id;
-    }
+
 
     //Setup a call
-    async #createCallDocument(CallObject) {
+    async #createCallDocument(CallObject, videoConferenceId) {
         let callDocumentData = await this.ajaxCall.videoCall.createCallDocument(
             {
                 offerDescription: CallObject,
-                conference_id: this.videoConferenceId,
+                conference_id: videoConferenceId,
+                callerId: this.callerId,
+                targetId: this.targetId,
                 '_token': this.csrf_token
             });
         this.comunicationData.callId = callDocumentData.documentId;
     }
     async #insertOfferIceCandidateInDatabase(iceCandidate) {
-
         let callDocumentData = await this.ajaxCall.videoCall.insertOfferIceCandidates(
             {
                 callDocumentId: this.comunicationData.callId,
@@ -164,7 +90,7 @@ export class VideoStreamObject {
             }
         }
     }
-    async call() {
+    async call(videoConferenceId) {
         const offerDescription = await this.connection.createOffer();
         this.connection.onicecandidate = event => {
             if (event.candidate) {
@@ -173,7 +99,7 @@ export class VideoStreamObject {
             }
         };
         let offer = JSON.stringify(offerDescription);
-        await this.#createCallDocument(offer);
+        await this.#createCallDocument(offer, videoConferenceId);
         await this.connection.setLocalDescription(offerDescription);
         this.timers.tmrAnswerDescription = new Timer("tmrAnswerDescription", this.#checkAnswerDescriptionChanges, 3, false);
         this.timers.tmrAnswerDescription.VSO = () => {return this};

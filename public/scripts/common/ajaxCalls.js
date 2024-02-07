@@ -98,7 +98,9 @@ export function ajaxCall() {
     }
 
     // VideoChatFunction
-
+    var _createSoundCall = async function (params) {
+        return _executeAsyncPOSTRequest("/conference/CreateSoundCall", params);
+    }
     var _createConference = async function (params) {
         return _executeAsyncPOSTRequest("/conference/create", params)
     }
@@ -150,7 +152,8 @@ export function ajaxCall() {
             checkNewOfferCandidates: _checkNewOfferCandidates,
             insertAnswerIceCandidates:_insertAnswerIceCandidates,
             getOfferDescription: _getOfferDescription,
-            setAnswerDescription: _setAnswerDescription
+            setAnswerDescription: _setAnswerDescription,
+            createSoundCall: _createSoundCall
         },
         email: {
             getFolders: _getFolders,
