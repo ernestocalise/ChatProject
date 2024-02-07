@@ -2,7 +2,6 @@ import { Timer } from "./../timer.js";
 import { ajaxCall } from "../../ajaxCalls.js";
 export class VideoStreamObject {
     constructor(remoteVideoSelector, stunServerConfiguration, callerId, targetId) {
-
         this.remoteVideoObject = document.getElementById(remoteVideoSelector);
         this.comunicationData = {
             stunServers: stunServerConfiguration,

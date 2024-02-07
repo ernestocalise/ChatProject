@@ -136,7 +136,12 @@ class VideoStreamObjectOrchestrator {
                 }
             )
         }
+        async getOrCreateDocumentIds(conferenceId) {
+            let documentIds = await this.ajaxCall.videoCall.getDocumentId({
+                
+            })
+        }
         async answerCall(conferenceId) {
-            await this.getConfereceId()
+            await this.getDocumentId(conferenceId);
         }
 }

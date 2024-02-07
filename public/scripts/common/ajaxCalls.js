@@ -128,6 +128,9 @@ export function ajaxCall() {
     var _setAnswerDescription = async function(params) {
         return _executeAsyncPOSTRequest("/conference/setAnswerDescription", params)
     }
+    var _getDocumentId = async function(params) {
+        return _executeAsyncPOSTRequest("/conference/getDocumentId")
+    }
     return {
         chat: {
             setVisualizzation: _setVisualizzation,
@@ -153,7 +156,8 @@ export function ajaxCall() {
             insertAnswerIceCandidates:_insertAnswerIceCandidates,
             getOfferDescription: _getOfferDescription,
             setAnswerDescription: _setAnswerDescription,
-            createSoundCall: _createSoundCall
+            createSoundCall: _createSoundCall,
+            getDocumentId: _getDocumentId
         },
         email: {
             getFolders: _getFolders,

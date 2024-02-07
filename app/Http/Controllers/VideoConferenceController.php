@@ -73,7 +73,37 @@ class VideoConferenceController extends Controller
             "status" => true
          ];
     }
+    public function GetOrCreateCallDocument(Request $request) {
+        $data = $request->validate([
+            "confereceId" => "numeric|required",
+            "targetId" => "string|required"
+        ]);
+        $targetId = auth()->user->id;
+        $callerId = $data["targetId"];
+        $conferenceId = $data["conderence_id"];
+        $videoChatDocument = null;
+        if(VideochatDocument::where('caller_id', $callerId)
+            ->where("target_id", $targetId)
+            ->where("conference_id", $conferenceId)->exists()){
+            $videoChatDocument = VideochatDocument::where('caller_id', $callerId)
+            ->where("target_id", $targetId)
+            ->where("conference_id", $conferenceId)->get();
+        } else if(VideochatDocument::where('caller_id', $targetId)
+        ->where("target_id", $callerId)
+        ->where("conference_id", $conferenceId)->exists()){
+            $videoChatDocument = VideochatDocument::where('caller_id', $targetId)
+            ->where("target_id", $callerId)
+            ->where("conference_id", $conferenceId)->get();
+        } else {
+            return (object)[
+                "status" => false,
+                "caller_id" => 0,
+                "target_id" => 0,
+                "conference_id" => $conference_id
+            ];
+        }
 
+    }
     public function InsertOfferIceCandidates (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
