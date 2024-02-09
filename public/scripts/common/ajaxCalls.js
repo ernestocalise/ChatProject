@@ -131,6 +131,9 @@ export function ajaxCall() {
     var _getDocumentId = async function(params) {
         return _executeAsyncPOSTRequest("/conference/getDocumentId")
     }
+    var _getConferenceParticipants = async function(params) {
+        return _executeAsyncPOSTRequest("/conference/getParticipants")
+    }
     return {
         chat: {
             setVisualizzation: _setVisualizzation,
@@ -148,6 +151,8 @@ export function ajaxCall() {
         },
         videoCall: {
             createConference: _createConference,
+            getConferenceParticipants: _getConferenceParticipants,
+
             createCallDocument: _createCallDocument,
             insertOfferIceCandidates: _insertOfferIceCandidates,
             checkAnswerDescriptionChanges: _checkAnswerDescriptionChanges,

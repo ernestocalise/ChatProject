@@ -2,8 +2,9 @@ import { ajaxCall } from "../../ajaxCalls";
 import { VideoStreamObject } from "./VideoStreamObject";
 
 class VideoStreamObjectOrchestrator {
-    constructor(localVideoSelector, videoElementContainer, stunServerConfiguration){
+    constructor(localVideoSelector, videoElementContainer, stunServerConfiguration, userId){
         this.videoConferenceId = 0;
+        this.userId = userId;
         this.stunServerConfiguration = stunServerConfiguration;
         this.localStream = new MediaStream();
         this.userMedia = {
@@ -106,7 +107,7 @@ class VideoStreamObjectOrchestrator {
                 });
             this.videoConferenceId = videoConferenceData.conference_id;
         }
-        async createCalls(userIds) {
+        async createSoundCalls(userIds) {
             await this.ajaxCall.videoCall.createSoundCall({
                 userIdCollection: userIds,
                 conferenceId: this.conferenceId,
@@ -125,7 +126,7 @@ class VideoStreamObjectOrchestrator {
         async startCall(userIds) {
             await this.createConference(userIds);
             await this.initializeUserMedia(this.userMedia.webcamStatus, this.userMedia.audioStatus, this.userMedia.screenStatus);
-            await this.createCalls(userIds);
+            await this.createSoundCalls(userIds);
             userIds.forEach(userId => {
                 videoElement = this.#createVideoElement(userId);
                 this.addVideoStreamObject(new VideoStreamObject(videoElement, this.stunServerConfiguration));
@@ -137,11 +138,14 @@ class VideoStreamObjectOrchestrator {
             )
         }
         async getOrCreateDocumentIds(conferenceId) {
+
             let documentIds = await this.ajaxCall.videoCall.getDocumentId({
                 
             })
         }
         async answerCall(conferenceId) {
+            await this.ajaxCall.videoCall.getConferenceParticipants(conferenceId);
+
             await this.getDocumentId(conferenceId);
         }
 }

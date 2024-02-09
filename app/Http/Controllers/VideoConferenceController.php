@@ -12,34 +12,82 @@ use Illuminate\Support\Facades\Http;
 use App\Models\SoundCall;
 class VideoConferenceController extends Controller
 {
+    //Configuration
     public static function retriveStunServerConfiguration(){
         $apiKey =  VideoConferenceController::RetriveMeteredApiKey();
         $res = Http::get('https://chatapplication.metered.live/api/v1/turn/credentials?apiKey='.$apiKey);
         return $res->body();
     }
+    public static function RetriveMeteredApiKey() {
+        return config("application-cluster.metered_api_key");
+    }
+
+    //UI Interface
     public function index () {
         $users = User::all()->except(array(auth()->user()->id, 0));
         $stunServerConfiguration = json_encode(VideoConferenceController::retriveStunServerConfiguration());
          return view("chat.videocall", compact("users", "stunServerConfiguration"));
     }
-    public static function RetriveMeteredApiKey() {
-        return config("application-cluster.metered_api_key");
-    }
-    public function StartVideoConference (Request $request) {
+
+    //Starting a call
+    public function CreateConference (Request $request) {
         $data = $request->validate([
-            "userIdCollection" => "string|required"
+            "userIds" => "required",
         ]);
-        $userIdCollection = json_decode($data["userIdCollection"]);
-        $conf = new Conference();
-         $conf->save();
-         foreach($userIdCollection as $userId) {
-            $conf->addParticipant($userId);
-         }
-         return (object) [
+        $userIds = $data["userIds"];
+        $conference = new Conference();
+        $conference->user_id = auth()->user()->id;
+        $conference->save();
+        foreach($userIds as $userId) {
+            $conference->addParticipant($userId);
+        }
+        return (object)[
             "status" => true,
-            "conferenceId" => $conf->id
-         ];
+            "conference_id" => $conference->id
+        ];
     }
+    public function GetConferenceParticipants (Request $request) {
+        $data = $request->validate([
+            "conferenceId" => "required|numeric",
+        ]);
+        $conference = Conference::findOrFail($data["conferenceId"]);
+        return $conference->getParticipants();
+    }
+    public function CheckVideoDocumentExists (Request $request) {
+        $videoDocumentExists = false;
+        $isTarget = false;
+        $videoDocumentId = 0;
+        $data = $request->validate([
+            "targetId" => "required|numeric",
+            "conferenceId" => "required|numeric"
+        ]);
+
+        if(VideochatDocument::where('caller_id', $targetId)
+        ->where("target_id", auth()->user()->id)
+        ->where("conference_id", $conferenceId)->exists()){
+            $isTarget = true;
+            $videoDocumentExists = true;
+            $videoDocument = VideochatDocument::where('caller_id', $targetId)
+            ->where("target_id", auth()->user()->id)
+            ->where("conference_id", $conferenceId)->get();
+            $videoDocumentId = $videoDocument[0]->id;
+        } else if(VideochatDocument::where('caller_id', auth()->user()->id)
+            ->where("target_id", $targetId)
+            ->where("conference_id", $conferenceId)->exists()){
+                $isTarget = false;
+                $videoDocumentExists = true;
+                $videoDocument = VideochatDocument::where('caller_id', auth()->user()->id)
+                ->where("target_id", $targetId)
+                ->where("conference_id", $conferenceId)->get();
+                $videoDocumentId = $videoDocument[0]->id;
+        }
+        return (object)[
+            "DocumentExists" => $videoDocumentExists,
+            "IsTarget" => $isTarget,
+            "VideoDocumentId" => $videoDocumentId
+        ];
+    }
+
     public function CreateSoundCall(Request $request) {
         $data = $request->validate([
             "userIdCollection" => "string|required",
@@ -119,7 +167,6 @@ class VideoConferenceController extends Controller
             "status" => true
         ];
     }
-
     public function CheckAnswerDescriptionChanges (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
@@ -138,7 +185,6 @@ class VideoConferenceController extends Controller
             "changed" => false
         ];
     }
-
     public function CheckNewAnswerIceCandidates (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
@@ -160,7 +206,6 @@ class VideoConferenceController extends Controller
             "iceCandidates" => $arrOutput
         ];
     }
-
     //Answering a call
     public function GetOfferDescription (Request $request) {
         $data = $request->validate([
@@ -174,7 +219,6 @@ class VideoConferenceController extends Controller
             "offer" => $offerDescription
         ];
     }
-
     public function InsertAnswerIceCandidates (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
@@ -190,7 +234,6 @@ class VideoConferenceController extends Controller
             "status" => true
         ];
     }
-
     public function CheckNewOfferIceCandidates (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
@@ -212,7 +255,6 @@ class VideoConferenceController extends Controller
             "data" => $arrOutput
         ];
     }
-
     public function SetAnswerDescription (Request $request) {
         $data = $request->validate([
             "callDocumentId" => "numeric|required",
@@ -225,23 +267,6 @@ class VideoConferenceController extends Controller
         $doc->save();
         return (object) [
             "status" => true
-        ];
-    }
-
-    public function CreateConference (Request $request) {
-        $data = $request->validate([
-            "userIds" => "required",
-        ]);
-        $userIds = $data["userIds"];
-        $conference = new Conference();
-        $conference->user_id = auth()->user()->id;
-        $conference->save();
-        foreach($userIds as $userId) {
-            $conference->addParticipant($userId);
-        }
-        return (object)[
-            "status" => true,
-            "conference_id" => $conference->id
         ];
     }
 }
