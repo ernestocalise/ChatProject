@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\VideochatDocument;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class Conference extends Model
 {
@@ -32,5 +33,25 @@ class Conference extends Model
                 $userColl[]= User::where('id', '=', $id->user_id)->first();
             }
             return $userColl;
+    }
+    public function findOrCreateVideoChatDocument($callUserId) {
+        $videoChatDocument = VideochatDocument::where("target_id", "=", auth()->user()->id)
+        ->where("caller_id", "=", $callUserId)->get();
+        if($videoChatDocument->count() > 0) {
+            return $videoChatDocument->first();
+        } else {
+            $videoChatDocument = VideochatDocument::where("target_id", "=", $callUserId)
+            ->where("caller_id", "=", auth()->user()->id)->get();
+            if($videoChatDocument->count() > 0) {
+                return $videoChatDocument->first();
+            } else {
+                $videoChatDocument = new VideochatDocument();
+                $videoChatDocument->caller_id = auth()->user()->id;
+                $videoChatDocument->target_id = $callUserId;
+                $videoChatDocument->conference_id = $this->id;
+                $videoChatDocument->save();
+                return $videoChatDocument;
+            }
+        }
     }
 }

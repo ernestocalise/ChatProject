@@ -13,7 +13,7 @@ class SoundCall extends Model
         return $this->belongsTo(Conference::class);
     }
     public function setupCall ($conferenceId, $callerId, $targetId) {
-         $this->conferenceId = $conference_id;
+         $this->conference_id = $conferenceId;
          $this->caller_id = $callerId;
          $this->target_id = $targetId;
     }

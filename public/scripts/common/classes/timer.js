@@ -10,7 +10,7 @@ export class Timer {
 
     tick() {
         if (this.enabled) {
-            if(this._tickExecuted >= this._interval/1000){
+            if(this._tickExecuted >= this._interval){
                 try {
                     this._tickExecuted = 0;
                     this._callback();

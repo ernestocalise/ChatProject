@@ -1,9 +1,10 @@
-import { ajaxCall } from "../../ajaxCalls";
-import { VideoStreamObject } from "./VideoStreamObject";
+import { ajaxCall } from "../../ajaxCalls.js";
+import { VideoStreamObject } from "./VideoStreamObject.js";
 
-class VideoStreamObjectOrchestrator {
+export class VideoStreamObjectOrchestrator {
     constructor(localVideoSelector, videoElementContainer, stunServerConfiguration, userId){
         this.videoConferenceId = 0;
+        this.csrf_token = null;
         this.userId = userId;
         this.stunServerConfiguration = stunServerConfiguration;
         this.localStream = new MediaStream();
@@ -22,9 +23,11 @@ class VideoStreamObjectOrchestrator {
         this.videoStreamObjectCollection = [];
         this.videoElementContainer = document.getElementById(videoElementContainer);
         this.ajaxCall = ajaxCall();
+        window.VSO = this;
     }
         addVideoStreamObject(object) {
             if(object instanceof VideoStreamObject) {
+                object.localStream = this.localStream;
                 this.videoStreamObjectCollection.push(object);
             }
         }
@@ -69,22 +72,25 @@ class VideoStreamObjectOrchestrator {
             this.userMedia.videoStream.getTracks().forEach(videoTrack => mixedStream.addTrack(videoTrack));
             this.userMedia.audioStream.getTracks().forEach(audioTrack => mixedStream.addTrack(audioTrack));
             this.localStream = mixedStream;
-            let senders = this.connection.getSenders();
-            senders.forEach(sender => {
-                this.videoStreamObjectCollection.forEach(
-                    VSO => {
-                        VSO.connection.removeTrack(sender);
-                    }
-                );
-            });
-            let orchestrator = this;
-            this.localStream.getTracks().forEach((track) => {
-                this.videoStreamObjectCollection.forEach(
-                    VSO => 
-                    {
-                        VSO.connection.addTrack(track, orchestrator.localStream);
-                    });
-            })
+            if(this.videoStreamObjectCollection.length > 0){
+
+                let senders = this.videoStreamObjectCollection[0].connection.getSenders();
+                senders.forEach(sender => {
+                    this.videoStreamObjectCollection.forEach(
+                        VSO => {
+                            VSO.connection.removeTrack(sender);
+                        }
+                    );
+                });
+                let orchestrator = this;
+                this.localStream.getTracks().forEach((track) => {
+                    this.videoStreamObjectCollection.forEach(
+                        VSO => 
+                        {
+                            VSO.connection.addTrack(track, orchestrator.localStream);
+                        });
+                })
+            }
             this.localVideoObject.srcObject = this.localStream;
 
         }
@@ -110,26 +116,32 @@ class VideoStreamObjectOrchestrator {
         async createSoundCalls(userIds) {
             await this.ajaxCall.videoCall.createSoundCall({
                 userIdCollection: userIds,
-                conferenceId: this.conferenceId,
+                conferenceId: this.videoConferenceId,
                 '_token': this.csrf_token
             });
             return true;
         }
         #createVideoElement(userId) {
-            this.videoElementContainer.append(
-                `
-                <video id="remoteVideo-${userId}-${this.conferenceId}" autoplay playsinline></video>
-                `
-            );
-            return `remoteVideo-${userId}-${this.conferenceId}`;
+            let videoContent = `
+            <h3>Video From ${userId}.</h3>
+            <video id="remoteVideo-${userId}-${this.videoConferenceId}" autoplay playsinline></video>`;
+            let span = document.createElement("span");
+            span.innerHTML = videoContent;
+            this.videoElementContainer.appendChild(span);
+            return `remoteVideo-${userId}-${this.videoConferenceId}`;
         }
         async startCall(userIds) {
             await this.createConference(userIds);
-            await this.initializeUserMedia(this.userMedia.webcamStatus, this.userMedia.audioStatus, this.userMedia.screenStatus);
+            userIds = userIds.filter(item => item !== this.userId)
+            this.userMedia.webcamStatus = true;
+            this.userMedia.audioStatus = true;
+            await this.initializeUserMedia(true,false,false);
             await this.createSoundCalls(userIds);
-            userIds.forEach(userId => {
-                videoElement = this.#createVideoElement(userId);
-                this.addVideoStreamObject(new VideoStreamObject(videoElement, this.stunServerConfiguration));
+            userIds.forEach(targetId => {
+                let videoElement = this.#createVideoElement(targetId);
+                let VSO = new VideoStreamObject(videoElement, this.stunServerConfiguration, this.userId, targetId);
+                VSO.csrf_token = this.csrf_token;
+                this.addVideoStreamObject(VSO);
             });
             this.videoStreamObjectCollection.forEach(
                 videoStream => {
@@ -137,15 +149,31 @@ class VideoStreamObjectOrchestrator {
                 }
             )
         }
-        async getOrCreateDocumentIds(conferenceId) {
-
-            let documentIds = await this.ajaxCall.videoCall.getDocumentId({
-                
-            })
-        }
         async answerCall(conferenceId) {
-            await this.ajaxCall.videoCall.getConferenceParticipants(conferenceId);
-
-            await this.getDocumentId(conferenceId);
+            this.videoConferenceId = conferenceId;
+            let participants = await this.ajaxCall.videoCall.getConferenceParticipants({
+                "_token": this.csrf_token,
+                "conferenceId":  this.videoConferenceId
+            });
+            this.userMedia.webcamStatus = true;
+            this.userMedia.audioStatus = true;
+            await this.initializeUserMedia();
+            participants.forEach(
+                async (participant) => {
+                    let videoElement = this.#createVideoElement(participant.id);
+                    let callDocument = await this.ajaxCall.videoCall.getOrCreateDocumentId({
+                        conference_id: conferenceId,
+                        target_id: participant.id,
+                        "_token": this.csrf_token
+                    })
+                    let VSO = new VideoStreamObject(videoElement, this.stunServerConfiguration, callDocument.callerId, callDocument.targetId);
+                    VSO.csrf_token = this.csrf_token;
+                    if(callDocument.isCaller) {
+                        await VSO.answerAsCaller(callDocument.documentId);
+                    } else {
+                        await VSO.answer(callDocument.documentId);
+                    }
+                }
+            )
         }
 }

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="chat.css">
+<link rel="stylesheet" href="/chat.css">
 <x-app-layout>
 <div class="csrf-container">
 @csrf
@@ -37,7 +37,7 @@
 	}
 	setTimeout(setPageData, 100);
 </script>
-<div class="videos">
+<div class="videos" id="videoContainer">
         <span>
             <h3>Local</h3>
             <video id="localVideo" autoplay playsinline></video>
@@ -48,9 +48,8 @@
         </span>
     </div>
 	
-	<button id="createConference" class="btn btn-primary">Create Conference</button>
-	<button id="requireUserMedia" class="btn btn-primary">Require User Media</button>
-	<button id="startCall" class="btn btn-primary">Start Call</button>
+	<button id="createConference" class="btn btn-primary">Send Calls</button>
+	<button id="playCallSound" class="btn btn-primary">Play Call Sound</button>
 	<input type="text" name="txtCallId" id="txtCallId">
 	<button id="answerCall" class="btn btn-primary">Answer Call</button>
 </div>

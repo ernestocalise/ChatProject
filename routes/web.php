@@ -68,11 +68,13 @@ if(config("application-cluster.chat_enabled")) {
     Route::middleware('auth')->group(function () {
         
         //Webpage
-        Route::get('/conference/show', [VideoConferenceController::class, 'index']);
+        Route::get('/conference/show', [VideoConferenceController::class, 'index'])->name("conference");
         //Creating Conference
         Route::post('/conference/create', [VideoConferenceController::class, 'CreateConference']);
         Route::post('/conference/CreateSoundCall', [VideoConferenceController::class, 'CreateSoundCall']);
-        
+        Route::post("/conference/checkIncomingSoundCall", [VideoConferenceController::class, "checkIncomingSoundCall"]);
+        Route::post("/conference/getParticipants", [VideoConferenceController::class, "GetConferenceParticipants"]);
+        Route::post("/conference/getDocumentId", [VideoConferenceController::class, "GetDocumentId"]);
         //Creating Call
         Route::post('/conference/start', [VideoConferenceController::class, 'StartVideoConference']);
         Route::post('/conference/createCallDocument', [VideoConferenceController::class, 'CreateCallDocument']);
@@ -84,6 +86,7 @@ if(config("application-cluster.chat_enabled")) {
         Route::post('/conference/checkNewOfferIceCandidates', [VideoConferenceController::class, 'CheckNewOfferIceCandidates']);
         Route::post('/conference/insertAnswerIceCandidates', [VideoConferenceController::class, 'InsertAnswerIceCandidates']);
         Route::post('/conference/setAnswerDescription', [VideoConferenceController::class, 'SetAnswerDescription']);
+        Route::post("/conference/getOrCreateDocumentId", [VideoConferenceController::class, "GetOrCreateDocumentId"]);
     });
 }
 
@@ -93,5 +96,7 @@ Route::middleware("auth")->group(function() {
     Route::get("/getFolders", [EmailController::class, "getFolders"]);
     Route::get("/getMailbox/{FolderId}/{orderBy?}/{startPosition?}/{endPosition?}",[EmailController::class, "getMailbox"]);
 });
+
+
 //Auth Routes
 require __DIR__.'/auth.php';

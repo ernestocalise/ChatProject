@@ -23,7 +23,9 @@ export class VideoStreamObject {
         this.csrf_token = "";
         this.ajaxCall = ajaxCall();
     }
-
+    setLocalStream(_stream) {
+        this.localStream = _stream;
+    }
     async #listenToRemoteStream() {
         this.connection.addEventListener('track', async (event) => {
             this.remoteStream = event.streams;
@@ -39,7 +41,6 @@ export class VideoStreamObject {
             {
                 offerDescription: CallObject,
                 conference_id: videoConferenceId,
-                callerId: this.callerId,
                 targetId: this.targetId,
                 '_token': this.csrf_token
             });
@@ -63,7 +64,7 @@ export class VideoStreamObject {
             });
         if (answerDescriptionChanges.changed) {
             if (!this.VSO().connection.currentRemoteDescription && answerDescriptionChanges.answer_candidate) {
-                const answerDescription = new RTCSessionDescription(answerDescriptionChanges.answer_candidate);
+                const answerDescription = new RTCSessionDescription(JSON.parse(answerDescriptionChanges.answer_candidate));
                 this.VSO().answerDescription = answerDescriptionChanges.answer_candidate;
                 this.VSO().connection.setRemoteDescription(answerDescription);
             }
@@ -71,13 +72,19 @@ export class VideoStreamObject {
 
     }
     async #checkNewAnswerCandidates() {
-        let data = await this.VSO().ajaxCall.videoCall.checkNewAnswerCandidates(
-            {
-                callDocumentId: this.VSO().comunicationData.callId,
-                userIceCandidateCount: this.VSO().comunicationData.remoteIceCandidates.length,
-                '_token': this.VSO().csrf_token
-            }
-        );
+        let data;
+        try {
+            data = await this.VSO().ajaxCall.videoCall.checkNewAnswerCandidates(
+                {
+                    callDocumentId: this.VSO().comunicationData.callId,
+                    userIceCandidateCount: this.VSO().comunicationData.remoteIceCandidates.length,
+                    '_token': this.VSO().csrf_token
+                }
+            );
+
+        } catch (ex) {
+            console.log(ex);
+        }
         if (data.status) {
             if (!this.VSO().connection.currentRemoteDescription && data.answer_candidate) {
                 data.iceCandidates.forEach(iceCandidate => {
@@ -161,6 +168,24 @@ export class VideoStreamObject {
         if (data.status) {
             return data.offer;
         }
+    }
+    async answerAsCaller(_callId) {
+        const offerDescription = await this.connection.createOffer();
+        this.comunicationData.callId = _callId;
+        this.connection.onicecandidate = event => {
+            if (event.candidate) {
+                this.comunicationData.localIceCandidates.push(event.candidate.toJSON());
+                this.#insertOfferIceCandidateInDatabase(event.candidate);
+            }
+        };
+        this.connection.setLocalDescription(offerDescription);
+        this.timers.tmrAnswerDescription = new Timer("tmrAnswerDescription", this.#checkAnswerDescriptionChanges, 3, false);
+        this.timers.tmrAnswerDescription.VSO = () => {return this};
+        this.timers.tmrAnswerDescription.start();
+        this.timers.tmrAnswerCandidate = new Timer("tmrAnswerCandidate", this.#checkNewAnswerCandidates, 3, false);
+        this.timers.tmrAnswerCandidate.VSO = () => {return this};
+        this.timers.tmrAnswerCandidate.start();
+        this.#listenToRemoteStream();
     }
     async answer(_callId) {
         this.comunicationData.callId = _callId;

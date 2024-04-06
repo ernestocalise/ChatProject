@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('email')" :active="request()->routeIs('email')">
                         {{ __('emails.email') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('conference')" :active="request()->routeIs('conference')">
+                         VideoChat 
+                    </x-nav-link>
                 </div>
             </div>
 

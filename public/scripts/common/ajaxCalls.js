@@ -98,6 +98,9 @@ export function ajaxCall() {
     }
 
     // VideoChatFunction
+    var _checkIncomingSoundCall = function(params) {
+        return _executeAsyncPOSTRequest("/conference/checkIncomingSoundCall", params);
+    }
     var _createSoundCall = async function (params) {
         return _executeAsyncPOSTRequest("/conference/CreateSoundCall", params);
     }
@@ -128,11 +131,11 @@ export function ajaxCall() {
     var _setAnswerDescription = async function(params) {
         return _executeAsyncPOSTRequest("/conference/setAnswerDescription", params)
     }
-    var _getDocumentId = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/getDocumentId")
+    var _getOrCreateDocumentId = async function(params) {
+        return _executeAsyncPOSTRequest("/conference/getOrCreateDocumentId", params)
     }
     var _getConferenceParticipants = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/getParticipants")
+        return _executeAsyncPOSTRequest("/conference/getParticipants", params)
     }
     return {
         chat: {
@@ -152,17 +155,20 @@ export function ajaxCall() {
         videoCall: {
             createConference: _createConference,
             getConferenceParticipants: _getConferenceParticipants,
+            createSoundCall: _createSoundCall,
+            checkIncomingSoundCall: _checkIncomingSoundCall,
 
             createCallDocument: _createCallDocument,
             insertOfferIceCandidates: _insertOfferIceCandidates,
             checkAnswerDescriptionChanges: _checkAnswerDescriptionChanges,
             checkNewAnswerCandidates: _checkNewAnswerCandidates,
+
+
+            getOrCreateDocumentId: _getOrCreateDocumentId,
             checkNewOfferCandidates: _checkNewOfferCandidates,
             insertAnswerIceCandidates:_insertAnswerIceCandidates,
             getOfferDescription: _getOfferDescription,
             setAnswerDescription: _setAnswerDescription,
-            createSoundCall: _createSoundCall,
-            getDocumentId: _getDocumentId
         },
         email: {
             getFolders: _getFolders,

@@ -139,3 +139,6 @@ right: 128%;
   border-style: solid;
   border-color: transparent transparent transparent #555;
 }
+#chatRingSound {
+  display:none;
+}

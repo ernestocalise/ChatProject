@@ -1,6 +1,7 @@
 import {ajaxCall} from "./../common/ajaxCalls.js";
 import {global} from "./../common/globalFunctions.js";
 import {VideoStreamObject} from "./../common/classes/chatProject/VideoStreamObject.js"
+import {VideoStreamObjectOrchestrator } from "./../common/classes/chatProject/VideoStreamObjectOrchestrator.js"
 var chatProject = chatProject || {};
 
 //Setting up chatPage
@@ -15,16 +16,20 @@ chatProject.videoCall = (function (me) {
     var _selectors = {
         csrf_token: 'meta[name=csrf-token]',
         inputVideo: "localVideo",
-        remoteVideo: "remoteVideo",
+        videoContainer: "videoContainer",
         createConference: "#createConference",
-        requireUserMedia: "#requireUserMedia",
+        playCallSound: "#playCallSound",
         startCall: "#startCall",
         txtCallId: "#txtCallId",
         answerCall: "#answerCall",
     };    
-    var _videoStreamObject = null;
+    var _videoStreamOrchestrator = null;
     var _texts = {};
-    var _fromPhpPage = {};
+    var _fromPhpPage = {
+        personalUserId: null,
+		initialUserStatus: null, 
+		stunServerConfiguration: null
+    };
     var _readPhpPageData = function() {
         _fromPhpPage = JSON.parse($("#fromPhpPage").val());
         console.log($("#fromPhpLocale").val());
@@ -36,14 +41,19 @@ chatProject.videoCall = (function (me) {
         await chatProject.fh.time.sleep(500);
         _readPhpPageData();
         console.log(_fromPhpPage, _texts);
-        _initializeVideoStreamObject();
+        _initializeVideoStreamOrchestrator();
+
+        var _answerCallButtonAction = function(x) {
+            _videoStreamOrchestrator.answerCall(x)
+        }
+        chatProject.fh.interface.checkIncomingCall($(_selectors.csrf_token).attr("content"), _answerCallButtonAction);
         _doBindings();
     };
 
     //Logical function
-    var _initializeVideoStreamObject = function () {
-        _videoStreamObject = new VideoStreamObject(_selectors.inputVideo, _selectors.remoteVideo, _fromPhpPage.stunServerConfiguration);
-        _videoStreamObject.csrf_token = $(_selectors.csrf_token).attr("content");
+    var _initializeVideoStreamOrchestrator = function () {
+        _videoStreamOrchestrator = new VideoStreamObjectOrchestrator(_selectors.inputVideo, _selectors.videoContainer, _fromPhpPage.stunServerConfiguration,_fromPhpPage.personalUserId);
+        _videoStreamOrchestrator.csrf_token = $(_selectors.csrf_token).attr("content");
     }
     //Graphical function
 
@@ -53,16 +63,16 @@ chatProject.videoCall = (function (me) {
     var _doBindings = function() {
         $(_selectors.answerCall).bind("click", function(){
             let callId = $(_selectors.txtCallId).val();
-            _videoStreamObject.answer(callId);
+            _videoStreamOrchestrator.answerCall(callId);
         });
         $(_selectors.createConference).bind("click", function(){
-            _videoStreamObject.createConference([2,3,4]);
+            _videoStreamOrchestrator.startCall([2,3,4,5,6]);
         });
-        $(_selectors.requireUserMedia).bind("click", function() {
-            _videoStreamObject.initializeUserMedia(true,false,false);
+        $(_selectors.playCallSound).bind("click", function() {
+            chatProject.fh.interface.playAudioIncomingCall();
         });
         $(_selectors.startCall).bind("click", function() {
-            _videoStreamObject.call();
+            _videoStreamOrchestrator.call();
         })
     }
     me.initialize = _initialize;
