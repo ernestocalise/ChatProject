@@ -23,7 +23,7 @@ return [
     | This value is the API KEY of the Metered STUN/TURN Server
     |
     */
-    "metered_api_key" => env("METERED_API_KEY", ""),
+    "AGORA_APP_ID" => env("AGORA_APP_ID", ""),
     /*
     |--------------------------------------------------------------------------
     | Profile Skill
@@ -32,7 +32,7 @@ return [
     | This value is the check of profile skill
     |
     */
-    "skill_enabled" => env("PROFILE_SKILL_ENABLED", false),
+    "AGORA_APP_CERTIFICATE" => env("AGORA_APP_CERTIFICATE", false),
 
     /*
     |--------------------------------------------------------------------------

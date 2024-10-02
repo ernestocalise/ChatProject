@@ -119,33 +119,6 @@ export function ajaxCall() {
     var _createConference = async function (params) {
         return _executeAsyncPOSTRequest("/conference/create", params)
     }
-    var _createCallDocument = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/createCallDocument", params)
-    }
-    var _insertOfferIceCandidates = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/insertOfferIceCandidates", params)
-    }
-    var _checkAnswerDescriptionChanges = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/checkAnswerDescriptionChanges", params)
-    }
-    var _checkNewAnswerCandidates = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/checkNewAnswerIceCandidates", params);
-    }
-    var _checkNewOfferCandidates = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/checkNewOfferIceCandidates", params)
-    }
-    var _insertAnswerIceCandidates = async function(params){
-        return _executeAsyncPOSTRequest("/conference/insertAnswerIceCandidates",params)
-    }
-    var _getOfferDescription = async function(params){
-        return _executeAsyncPOSTRequest("/conference/getOfferDescription",params)
-    }
-    var _setAnswerDescription = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/setAnswerDescription", params)
-    }
-    var _getOrCreateDocumentId = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/getOrCreateDocumentId", params)
-    }
     var _getConferenceParticipants = async function(params) {
         return _executeAsyncPOSTRequest("/conference/getParticipants", params)
     }
@@ -170,18 +143,6 @@ export function ajaxCall() {
             getConferenceParticipants: _getConferenceParticipants,
             createSoundCall: _createSoundCall,
             checkIncomingSoundCall: _checkIncomingSoundCall,
-
-            createCallDocument: _createCallDocument,
-            insertOfferIceCandidates: _insertOfferIceCandidates,
-            checkAnswerDescriptionChanges: _checkAnswerDescriptionChanges,
-            checkNewAnswerCandidates: _checkNewAnswerCandidates,
-
-
-            getOrCreateDocumentId: _getOrCreateDocumentId,
-            checkNewOfferCandidates: _checkNewOfferCandidates,
-            insertAnswerIceCandidates:_insertAnswerIceCandidates,
-            getOfferDescription: _getOfferDescription,
-            setAnswerDescription: _setAnswerDescription,
         },
         email: {
             getFolders: _getFolders,

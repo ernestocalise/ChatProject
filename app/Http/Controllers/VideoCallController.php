@@ -16,8 +16,8 @@ class VideoCallController extends Controller
     //TokenGeneration
     public function getToken ($channelName) {
          
-        $appID = "4de78852bad54011b78f104338d92405";
-        $appCertificate = "17f7be0ef5ac4b0da9ddeac0d38f7663";
+        $appID =  config("application-cluster.AGORA_APP_ID");
+        $appCertificate = config("application-cluster.AGORA_APP_CERTIFICATE");
         $oneDayInSeconds = 60*60*24;
         $expiresInSeconds = $oneDayInSeconds; // For how many seconds this token is kept valid.
         $channelName = $channelName; // Channel name which should be accessible.
