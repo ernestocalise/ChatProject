@@ -242,7 +242,7 @@ chatProject.videoCall = (function (me) {
         ClientConfiguration.LocalTracks.AudioTrack = await AgoraRTC.createMicrophoneAudioTrack(ClientConfiguration.ClientConfigurationObject.GetMicrophoneConfigurationObject());
         ClientConfiguration.LocalTracks.AudioTrack.setMuted(ClientConfiguration.AudioSettings.IsMicrophoneMuted);
         if(ClientConfiguration.WebcamSettings.IsCameraStreamEnabled){
-            localTracks.push(await AgoraRTC.createCameraVideoTrack(ClientConfiguration.ClientConfigurationObject.GetWebcamConfigurationObject()));
+            ClientConfiguration.LocalTracks.VideoTrack = await AgoraRTC.createCameraVideoTrack(ClientConfiguration.ClientConfigurationObject.GetWebcamConfigurationObject());
         }
     
         let player = `<div class="video-container" id="user-container-${ClientConfiguration.UID}">
@@ -257,7 +257,7 @@ chatProject.videoCall = (function (me) {
         let localTracks = [];
         localTracks.push(ClientConfiguration.LocalTracks.AudioTrack);
         if(ClientConfiguration.WebcamSettings.IsCameraStreamEnabled){
-            ClientConfiguration.LocalTracks.VideoTrack.play(`user-${UID}`)
+            ClientConfiguration.LocalTracks.VideoTrack.play(`user-${ClientConfiguration.UID}`)
             localTracks.push(ClientConfiguration.LocalTracks.VideoTrack);
         }
         await client.publish(localTracks);
