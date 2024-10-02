@@ -1,5 +1,6 @@
+@extends('layouts.app')
+@section("content")
 <link rel="stylesheet" href="css/email.css">
-<x-app-layout>
 <div class="csrf-container">
 @csrf
 </div>
@@ -95,9 +96,10 @@
 		</div>
 	</div>
 </div>
-</x-app-layout>
 <form method="POST" action="#" enctype="multipart/form-data" id="fileUploader">
         <input id="iptFileUpload" type="file" accept="image/*, .zip, .rar, .pdf, .doc, .txt" name="iptFileUpload">
     </form>
 
 <script type="module" src="/scripts/view/email.js"></script>
+
+@stop

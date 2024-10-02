@@ -46,6 +46,7 @@ chatProject.chatPage = (function (me) {
         chatBox: {
             txtMessage: "#txtMessage",
             btnFileUpload: "#btnFileUpload",
+            btnStartCall: "#btnStartCall",
             btnSendMessage: "#btnSendMessage",
             iptFileUploader: "#iptFileUpload",
             messageTarget: "#messageTarget>ul",
@@ -123,6 +124,7 @@ chatProject.chatPage = (function (me) {
         _widgets.sideBar.searchBar.on('input',function() {
             _findChat(_widgets.sideBar.searchBar.val());
         });
+        $(_selectors.chatBox.btnStartCall).on("click", _startVideoCall);
         $(_selectors.chatBox.iptFileUploader).on("change",_iptFileUpload_change);
         _widgets.sideBar.profile.status.statusButton.on("click", _btnStatus_click);
         _widgets.sideBar.profile.status.statusOptions.each(function(index) {
@@ -257,6 +259,9 @@ chatProject.chatPage = (function (me) {
             chatProject.ajaxCall.sendMessage(data, function() {}, function() {});
         }
     };
+    var _startVideoCall = function() {
+        window.open(`/conference/show/${_activeChatId}`, "Videochiamata", "toolbar=0,location=0,menubar=0");
+    }
     var _openOrCreateChat = function(userId) {
         chatProject.fh.interface.showLoader();
         let data = {

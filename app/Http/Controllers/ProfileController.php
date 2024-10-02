@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmailConfigurationUpdateRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
+use App\Models\User;
+use App\Models\email_configuration;
 class ProfileController extends Controller
 {
     /**
@@ -17,6 +20,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        if($request->user()->profile->EmailConfiguration == null) {
+            $emailConfiguration = new email_configuration();
+            $emailConfiguration->setUsername("");
+            $emailConfiguration->setPassword("");
+            $emailConfiguration->hostName = "";
+            $emailConfiguration->profile_id = $request->user()->profile->id;
+            $emailConfiguration->save();
+        }
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
@@ -38,6 +49,15 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    public function editEmailConfiguration (EmailConfigurationUpdateRequest $request): RedirectResponse 
+    {
+        $data = $request->validated();
+        $request->user()->profile->emailConfiguration->hostname = $data["hostname"];
+        $request->user()->profile->emailConfiguration->setUsername($data["username"]);
+        $request->user()->profile->emailConfiguration->setPassword($data["mailConfigurationPassword"]);
+        $request->user()->profile->emailConfiguration->save();
+        return Redirect::route('profile.edit')->with('status', 'email-configuration-updated');
+    }
     /**
      * Delete the user's account.
      */
@@ -63,6 +83,14 @@ class ProfileController extends Controller
     public function setStatus($statusCode) {
         $data = validator(compact("statusCode"), ["statusCode" => "required|numeric"])->validate();
         auth()->user()->setStatus($data["statusCode"]);
+    }
+    public function getUserInformation ($userId) {
+         $user = User::find($userId);
+         return (object)[
+            "id" => $user->id,
+            "username" => $user->name,
+            "profile_pic" => "https://ui-avatars.com/api/?name=".$user->name
+         ];
     }
     public function getStatus($userId) {
         $data = validator(compact("userId"), ["userId" => "required|numeric"])->validate();

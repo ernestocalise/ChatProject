@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\VideoCallController;
 use App\Http\Controllers\VideoConferenceController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,9 @@ Route::middleware('auth')->group(function () {
     //Edit profile functions
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::patch('/profileU', [ProfileController::class, 'editEmailConfiguration'])->name('profile.editEmailConfiguration');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        
     //Show profile functions
         Route::get('/profile/{profileId}', [ProfileController::class, 'show']);
 });
@@ -47,6 +50,7 @@ if(config("application-cluster.chat_enabled")) {
     Route::middleware("auth")->group(function() {
         Route::get("/user/setStatus/{statusCode}", [ProfileController::class, "setStatus"]);
         Route::get("/user/getStatus/{userId}", [ProfileController::class, "getStatus"]);
+        Route::get("/user/getUserInformation/{userId}", [ProfileController::class, "getUserInformation"]);
         Route::get("/user/restoreStatus", [ProfileController::class, "restoreStatus"]);
     });
     //ChatFunctions
@@ -68,7 +72,9 @@ if(config("application-cluster.chat_enabled")) {
     Route::middleware('auth')->group(function () {
         
         //Webpage
-        Route::get('/conference/show', [VideoConferenceController::class, 'index'])->name("conference");
+        Route::get('/conference/show/{chatId}', [VideoCallController::class, 'StartOrJoinCall'])->name("conference");
+        //Creating Token
+        Route::get("/videoCall/start/{channelName}", [VideoCallController::class, "getToken"]);
         //Creating Conference
         Route::post('/conference/create', [VideoConferenceController::class, 'CreateConference']);
         Route::post('/conference/CreateSoundCall', [VideoConferenceController::class, 'CreateSoundCall']);

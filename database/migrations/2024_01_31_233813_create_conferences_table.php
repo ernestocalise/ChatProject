@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('conferences', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
+            $table->unsignedBigInteger("chat_id");
+            $table->timestamp("expire_date");
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('chat_id')->references('id')->on('chats');
         });
     }
 

@@ -1,5 +1,6 @@
+@extends('layouts.app')
+@section('content')
 <link rel="stylesheet" href="chat.css">
-<x-app-layout>
 <div class="csrf-container">
 @csrf
 </div>
@@ -35,6 +36,7 @@
 	phpLocaleData = undefined;
 	setPageData = undefined;
 	}
+	
 	setTimeout(setPageData, 100);
 </script>
 <div id="frame">
@@ -96,7 +98,7 @@
 			<img src="" alt="" />
 			<p></p>
 			<div class="social-media">
-			<i class="fa-solid fa-phone"></i>
+			<a id="btnStartCall"><i class="fa-solid fa-phone"></i></a>
 			<i class="fa-solid fa-video"></i>
 			<i class="fa-solid fa-bars-staggered"></i>
 			</div>
@@ -114,9 +116,9 @@
 		</div>
 	</div>
 </div>
-</x-app-layout>
 <form method="POST" action="#" enctype="multipart/form-data" id="fileUploader">
         <input id="iptFileUpload" type="file" accept="image/*, .zip, .rar, .pdf, .doc, .txt" name="iptFileUpload">
     </form>
 
 <script type="module" src="/scripts/view/chat.js"></script>
+@stop

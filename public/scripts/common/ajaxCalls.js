@@ -42,6 +42,12 @@ export function ajaxCall() {
                 data: params,
             });
     }
+    var _executeAsyncGETRequest = async function (apiName) {
+        return $.ajax({
+            url: apiName,
+            type: "GET"
+        });
+    }
     //Chat Functions: 
     var _setVisualizzation = function (messageId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/chats/setVisualizzation/${messageId}`, successCallback, errorCallback);
@@ -98,7 +104,13 @@ export function ajaxCall() {
     }
 
     // VideoChatFunction
-    var _checkIncomingSoundCall = function(params) {
+    var _setVisualizzation = function (messageId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/chats/setVisualizzation/${messageId}`, successCallback, errorCallback);
+    };
+    var _getUserInformation = async function(userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        return  _executeGETRequest(`/user/getUserInformation/${userId}`, successCallback, errorCallback )
+    }
+    var _checkIncomingSoundCall = async function(params) {
         return _executeAsyncPOSTRequest("/conference/checkIncomingSoundCall", params);
     }
     var _createSoundCall = async function (params) {
@@ -150,7 +162,8 @@ export function ajaxCall() {
             checkChatCount: _checkChatCount,
             getStatus: _getStatus,
             setStatus: _setStatus,
-            restoreStatus: _restoreStatus
+            restoreStatus: _restoreStatus,
+            getUserInformation: _getUserInformation
         },
         videoCall: {
             createConference: _createConference,
