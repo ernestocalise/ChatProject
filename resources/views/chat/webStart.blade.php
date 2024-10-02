@@ -61,7 +61,7 @@
 				<div id="prejoin">
 					<div id="prejoin-configuration">
 						<div id="webcamContainer">
-							<label for="webcams">{{__("Seleziona la Webcam")}}
+							<label for="webcams">{{__("Stato Webcam")}}
 								<label class="switch">
 									<input type="checkbox" id="chkWebcams">
 									<span class="slider round"></span>
@@ -77,7 +77,7 @@
 									</div>
 								</div>
 								<div class="option-container">
-									<label>
+									<label class="checkbox-label">
 										<input type="checkbox" name="chkWebcamOptimizationMode" id="chkWebcamOptimizationMode" >
 										Optimization Mode</label>
 
@@ -86,7 +86,7 @@
 
 						</label>
 						<div id="microphoneContainer">
-							<label for="microphones">{{__("Seleziona il microfono")}}
+							<label for="microphones">{{__("Stato Microfono")}}
 								<label class="switch">
 									<input type="checkbox" id="chkMicrophones" checked>
 									<span class="slider round"></span>
@@ -102,14 +102,14 @@
 								</div>
 							</div>
 							<div class="option-container">
-								<label><input type="checkbox" name="chkAcousticEchoCancellation" id="chkAcousticEchoCancellation" >AcousticEchoCancellation</label>
-								<label><input type="checkbox" name="chkAudioGainControl" id="chkAudioGainControl" >AudioGainControl</label>
-								<label><input type="checkbox" name="chkAutomaticNoiseSuppression" id="chkAutomaticNoiseSuppression" >AutomaticNoiseSuppression</label>
+								<label class="checkbox-label"><input type="checkbox" name="chkAcousticEchoCancellation" id="chkAcousticEchoCancellation" >AcousticEchoCancellation</label>
+								<label class="checkbox-label"><input type="checkbox" name="chkAudioGainControl" id="chkAudioGainControl" >AudioGainControl</label>
+								<label class="checkbox-label"><input type="checkbox" name="chkAutomaticNoiseSuppression" id="chkAutomaticNoiseSuppression" >AutomaticNoiseSuppression</label>
 
 							</div>
 						</div>
 						<div id="speakerContainer">
-							<label for="speakers">{{__("Seleziona lo speaker")}}
+							<label for="speakers">{{__("Seleziona Dispositivo di output")}}
 							</label>
 								<div class="select-container">
 									<select id="speakers" name="speakers" class="select-box">

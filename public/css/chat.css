@@ -100,6 +100,7 @@ button:hover {
     "main"
     "footer";
     height: 100%;
+    gap:1rem;
 }
 #main {
     grid-area: main;
@@ -230,7 +231,43 @@ button{
 span {
     transition: all 0.3s ease;
 }
-
+input[type="checkbox"]{
+    appearance: none;
+    -webkit-appearance: none;
+    height: 30px;
+    width: 30px;
+    background-color: #d5d5d5;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease
+}
+input[type="checkbox"]:after{
+    font-family: "Material Symbols Outlined";
+    content:"\e5ca";
+    font-weight: 900;
+    font-size: 20px;
+    color:white;
+    display: none;
+}
+input[type="checkbox"]:hover{
+    background-color: #a5a5a5;
+}
+input[type="checkbox"]:checked{
+background-color: #55cd3e;
+}
+input[type="checkbox"]:checked:after{
+    display:block;
+}
+.checkbox-label {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
 .select-container {
     display:flex;
     justify-content: center;
@@ -241,12 +278,16 @@ span {
 .select-container .select-box {
     border:none;
     appearance: none;
+    -webkit-appearance: none;
     padding: 0 30px 0 15px;
     width: 100%;
     color:white;
     background-color: cadetblue;
     font-size: 20px;
-
+    transition: all 0.2s ease
+}
+.select-box:hover {
+    opacity:0.8;
 }
 .select-container .icon-container {
     width: 50px;
@@ -256,6 +297,7 @@ span {
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
 }
 .select-container .icon-container span {
     font-size: 30px;
