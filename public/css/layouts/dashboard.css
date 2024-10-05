@@ -1,0 +1,248 @@
+:root {
+    --background: #40444b;
+    --form-elements-background: #202225;
+    --form-elements-background-hover:#2f3136;
+    --active: #7289da;
+    --text-color: #dfdfdf;
+    --color-danger: rgb(185, 60, 60);
+    --notification-bubble-color: rgb(185, 60, 60);
+    --color-add:#2ecc71;
+    --status-active: #2ecc71;
+    --status-away: #f1c40f;
+    --status-busy: var(--color-danger);
+    --status-offline: #95a5a6;
+    font-family: "Inter", sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+  }
+  @supports (font-variation-settings: normal) {
+    :root { font-family: InterVariable, sans-serif; }
+  }
+  body {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "menubar main";
+    margin:0;
+    padding:0;
+    color:var(--text-color);
+    scrollbar-width: thin;
+    scrollbar-color: var(--form-elements-background);
+    overflow:hidden;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: bolder;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: bolder;
+  }
+/* START MENUBAR*/
+  .layout-menu-bar {
+    grid-area: "menubar";
+    background-color: var(--form-elements-background);
+    margin:0;
+    padding:0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .layout-menu-bar > .items-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .layout-menu-bar > .user-container {
+    display: flex;
+    flex-direction: column;
+  }
+  /* MenuBar Item to work Discord-like  */
+  .layout-menu-bar-menu-item {
+    width: 60px;
+    height: 60px;
+    margin-left:4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--form-elements-background-hover);
+    margin-top: 8px;
+    border-radius: 50px;
+    position:relative;
+    transition: all 0.3s ease;
+    cursor:pointer;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+  .layout-menu-bar-menu-item span {
+    transition: all 0.3s ease;
+    font-size: 28px !important;
+    font-weight: lighter !important;
+    position:absolute;
+    top:50;
+    left:50;
+  }
+  .layout-menu-bar-menu-item:hover span {
+    font-size: 40px !important;
+  }
+  .layout-menu-bar-menu-item:hover span,
+  .layout-menu-bar-menu-item-active span {
+    font-weight: bolder !important;
+  }
+  .layout-menu-bar-menu-item:hover {
+    background: var(--active);
+    border-radius: 25px;
+  }
+  .layout-menu-bar-menu-item::before {
+    background-color: #e6e6e6;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+    content: "";
+    height: 12px;
+    left: -4px;
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: height 300ms, opacity 300ms;
+    width: 4px;
+    height: 10px;
+  }
+  .layout-menu-bar-menu-item:hover::before {
+    height: 40px;
+  }
+  .layout-menu-bar-menu-item-active {
+    background: var(--active) !important;
+    border-radius: 25px !important; 
+  }
+  .layout-menu-bar-menu-item-active::before {
+    height: 40px !important;
+  } 
+
+  .layout-menu-bar-menu-item .notification-bubble {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    background-color: var(--color-danger);
+    font-weight: 600;
+    padding: 5px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    opacity: 0;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    transition: all 0.5s linear;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .layout-menu-bar-menu-item .notification-bubble-active {
+    visibility:visible !important;
+    opacity: 1 !important;
+  }
+  .layout-menu-bar-menu-item .status-active {
+    background-color: var(--status-active)!important;
+  }
+  .layout-menu-bar-menu-item .status-away {
+    background-color: var(--status-away)!important;
+  }
+  .layout-menu-bar-menu-item .status-busy {
+    background-color: var(--status-busy)!important;
+  }
+  .layout-menu-bar-menu-item .status-offline {
+    background-color: var(--status-offline)!important;
+  }
+  /* START TOOLTIP MENUBAR  */
+ .tooltip {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 150ms;
+    z-index: 999;
+  }
+ .tooltip:after {
+    background-color: #141414;
+    content: "";
+    height: 8px;
+    position: absolute;
+    width: 8px;
+  }
+  .tooltip.right {
+    right: -9px;
+    top: 50%;
+    transform: translate(100%, -50%);
+  }
+  .tooltip.right:after {
+    left: 0px;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  .tooltip.top {
+    left: 50%;
+    top: -9px;
+    transform: translate(-50%, -100%);
+  }
+  .tooltip.top:after {
+    bottom: 0px;
+    left: 50%;
+    transform: translate(-50%, 50%) rotate(45deg);
+  }
+  .tooltip.bottom:after {
+    top: 0px;
+    right: 50%;
+    transform: translate(50%, -50%) rotate(45deg);
+  }
+  .tooltip.bottom {
+    transform: translate(-65%, 100%);
+  }
+  .tooltip p {
+    background-color: #141414;
+    border-radius: 6px;
+    color: #e6e6e6;
+    font-weight: 550;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+  .layout-menu-bar-menu-item:hover .tooltip {
+    opacity: 1;
+  }
+  /* END TOOLTIP MENUBAR*/
+/* END MENUBAR Work-like */
+/* START MENUBAR ITEMS */
+#logout-btn {
+  justify-self: end;
+}
+#logout-btn:hover {
+  background-color: rgb(185, 60, 60);
+}
+/* END MENUBAR ITEMS*/
+
+/* START MAIN & PANELS */
+  .layout-main {
+    grid-area: "main";
+    background-color: var(--background);
+    margin:0;
+    padding:0;
+  }
+  .layout-panel {
+    background:var(--background);
+    width:100%;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s linear;
+    display: none;
+    max-height: 100vh;
+    overflow:scroll;
+  }
+  .layout-panel-active {
+    display: block;
+  }
+  .layout-panel-visible {
+    visibility: visible;
+    opacity: 1;
+  }
+  #layout-panel-chat::-webkit-scrollbar { width: 0 !important }

@@ -30,6 +30,28 @@ class ChatMessage extends Model
         $this->message = json_encode($messageObj);
     }
 
+    function getMessageComponentData() {
+        if($this->type != 1) {
+            $this->setFileMessage();
+        }
+        $item = (object)[
+            "messageId" => $this->id,
+            "content" => $this->message,
+            "senderImage" => $this->User->profileImage(),
+            "sender" => $this->User->name,
+            "type" => $this->type,
+            "sent_at" => $this->created_at,
+            "sent_from_user" => $this->User->id == auth()->user()->id,
+            "viewed_from" => $this->viewed_from
+        ];
+        $returnObject = (object)[
+            "chatName" => $this->Chat->description,
+            "chatId" => $this->Chat->id,
+            "chatImage" => $this->Chat->getImage(),
+            "message" => $item
+        ];
+        return $returnObject;
+    }
     function SetVisualizzation() {
         $objViewed = json_decode($this->viewed_from);
         $objViewed[]=auth()->user()->id;

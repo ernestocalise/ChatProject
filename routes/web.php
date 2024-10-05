@@ -43,7 +43,12 @@ Route::middleware('auth')->group(function () {
     //Show profile functions
         Route::get('/profile/{profileId}', [ProfileController::class, 'show']);
 });
+//Layout
 
+Route::get("/layout", function() {
+    $user = auth()->user();
+    return view("layouts.dashboard", compact("user"));
+});
 //Chat Application
 if(config("application-cluster.chat_enabled")) {
     //Status Functions
@@ -80,19 +85,6 @@ if(config("application-cluster.chat_enabled")) {
         Route::post('/conference/CreateSoundCall', [VideoConferenceController::class, 'CreateSoundCall']);
         Route::post("/conference/checkIncomingSoundCall", [VideoConferenceController::class, "checkIncomingSoundCall"]);
         Route::post("/conference/getParticipants", [VideoConferenceController::class, "GetConferenceParticipants"]);
-        Route::post("/conference/getDocumentId", [VideoConferenceController::class, "GetDocumentId"]);
-        //Creating Call
-        Route::post('/conference/start', [VideoConferenceController::class, 'StartVideoConference']);
-        Route::post('/conference/createCallDocument', [VideoConferenceController::class, 'CreateCallDocument']);
-        Route::post('/conference/insertOfferIceCandidates', [VideoConferenceController::class, 'InsertOfferIceCandidates']);
-        Route::post('/conference/checkAnswerDescriptionChanges', [VideoConferenceController::class, 'CheckAnswerDescriptionChanges']);
-        Route::post('/conference/checkNewAnswerIceCandidates', [VideoConferenceController::class, 'CheckNewAnswerIceCandidates']);
-        //Answering call
-        Route::post('/conference/getOfferDescription', [VideoConferenceController::class, 'GetOfferDescription']);
-        Route::post('/conference/checkNewOfferIceCandidates', [VideoConferenceController::class, 'CheckNewOfferIceCandidates']);
-        Route::post('/conference/insertAnswerIceCandidates', [VideoConferenceController::class, 'InsertAnswerIceCandidates']);
-        Route::post('/conference/setAnswerDescription', [VideoConferenceController::class, 'SetAnswerDescription']);
-        Route::post("/conference/getOrCreateDocumentId", [VideoConferenceController::class, "GetOrCreateDocumentId"]);
     });
 }
 

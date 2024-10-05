@@ -1,0 +1,316 @@
+.chat-container {
+    width: 100%;
+    height: 100%;
+    display:grid;
+    grid-template-columns: 1fr 5fr;
+    grid-template-rows: 50px 1fr;
+    grid-template-areas: 
+    "search topbar"
+    "userlist main";
+    overflow:hidden;
+}
+/*-----INIZIO DIALOGBOX --- DIALOG ----*/
+
+
+.chat-container > .chat-container-dialog-box-container {
+    display: block;
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index:100;
+    background: rgba(20, 20, 20,.6);
+    display: none;;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box {
+    position:absolute;
+    top:25%;
+    left:30%;
+    width:40%;
+    height: 50%;
+    background-color: var(--form-elements-background);
+    border:1px solid var(--text-color);
+    border-radius: 10px;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    padding:2rem;
+    gap:1rem;
+    align-items: center;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-textbox {
+    height: 80px;
+    background: var(--form-elements-background);
+    color: var(--text-color);
+    font-size: 32px;
+    width: 86%;
+    border-radius: 10px;
+}
+
+/*-----FINE DIALOGBOX --- DIALOG ----*/
+
+/*-----INIZIO SEARCHBAR --- TOPLEFT ----*/
+.chat-container > .search-bar-container {
+    grid-area: "search";
+    background-color: var(--form-elements-background-hover);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid black;
+    position:relative;
+}
+.chat-container > .search-bar-container > #chat-container-search-bar,
+.chat-container > .topbar > .action-container > #chat-container-topbar-search-bar {
+    height: 50%;
+    background: var(--form-elements-background);
+    color: var(--text-color);
+    font-size: 12px;
+    width: 86%;
+    border-radius: 25px;
+}
+
+.chat-container > .search-bar-container > #chat-container-search-bar-container-btnAdd {
+    position: absolute;
+    right: 8%;
+    font-size: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: background 0.5s ease;
+}
+.chat-container > .search-bar-container > #chat-container-search-bar-container-btnAdd:hover {
+    background-color: var(--color-add);
+}
+/*-----FINE SEARCHBAR --- TOPLEFT ----*/
+/*-----INIZIO TOPBAR --- TOP CENTER AND RIGHT ----*/
+.chat-container > .topbar {
+    grid-area: "topbar";
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    border-bottom:1px solid var(--form-elements-background);
+}
+.chat-container > .topbar > .profile-information {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: 100%;
+    gap: 1rem;
+    margin-left:1rem;
+}
+.chat-container > .topbar > .profile-information img {
+    max-height: 80%;
+    border-radius: 50%;
+    border:1px solid var(--form-elements-background);
+}
+.chat-container > .topbar > .profile-information span {
+font-weight: bolder;
+}
+
+.chat-container > .topbar > .action-container {
+    display: flex;
+    gap:1.5rem;
+    height: 100%;
+    margin-right: 30px;
+    align-items: center;
+}
+.chat-container > .topbar > .action-container > .chat-container-topbar-action {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 28px;
+}
+.chat-container > .topbar > .action-container > .chat-container-topbar-action:hover {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color:white;
+}
+.chat-container > .topbar > .action-container > .chat-container-topbar-action:hover .tooltip {
+    opacity: 1;
+}
+/*-----FINE TOPBAR --- TOP CENTER AND RIGHT ----*/
+/*-----INIZIO USERLIST --- LEFT AND BOTTOM LEFT ----*/
+.chat-container > .userlist-container::-webkit-scrollbar { width: 0.5rem;}
+.chat-container > .userlist-container::-webkit-scrollbar-track { background: var(--form-elements-background-hover) }
+.chat-container > .userlist-container::-webkit-scrollbar-thumb { background: var(--form-elements-background)}
+.chat-container > .userlist-container {
+    grid-area: "userlist";
+    background-color: var(--form-elements-background-hover);
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:5px;
+    padding-right: 10px;
+}
+
+.chat-container > .userlist-container > .userlist-container-chatbox {
+    display:flex;
+    flex-direction: row;
+    height: 60px;
+    justify-content: start;
+    padding:10px;
+    gap:1rem;
+    border-radius: 15px;
+    align-items: center;
+    cursor: pointer;
+}
+.chat-container > .userlist-container > .userlist-container-chatbox:hover {
+    background: var(--background);
+    
+}.chat-container > .userlist-container > .userlist-container-chatbox-active {
+    background: var(--background) !important;
+}
+
+.chat-container > .userlist-container > .userlist-container-chatbox > img {
+    height: 90%;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.chat-container > .userlist-container > .userlist-container-chatbox > span {
+    color:var(--text-color);
+    font-weight: bolder;
+    cursor: pointer;
+}
+/*-----FINE USERLIST --- LEFT AND BOTTOM LEFT ----*/
+/*-----INIZIO MAIN CONTAINER --- MAIN ----*/
+.chat-container > .main-container::-webkit-scrollbar { width: 0 !important }
+.chat-container > .main-container {
+    grid-area: "main";
+    display:flex;
+    flex-direction: row;
+    max-height: 100%;
+    overflow-y: scroll;
+}
+
+.chat-container > .main-container > .main-container-content {
+    display:grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 9fr 50px;
+    grid-template-areas: 
+    "chatMessageArea"
+    "chatTextArea";
+    width: 100%;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container {
+    width: 100%;
+    overflow-y: scroll;
+    
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container::-webkit-scrollbar { width: 1em;}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container::-webkit-scrollbar-track { background: var(--form-elements-background-hover)}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container::-webkit-scrollbar-thumb { background: var(--form-elements-background)}
+
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    padding:10px 10px 0px 5px;
+    transition:all 1s ease;
+    cursor:text;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message:hover{
+    background-color: var(--form-elements-background-hover);
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfo{
+    max-height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    display:none;
+    padding-left:10px;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfoVisible {
+    display:flex !important;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfo > img{
+    border-radius: 50%;
+    border:1px solid var(--form-elements-background);
+    height: 40px;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfo > span{
+    font-weight: bolder;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span{
+    padding-left:60px;
+}
+
+/*-----FINE MAIN CONTAINER --- MAIN ----*/
+/*-----INIZIO BOTTOM BAR --- MAIN ----*/
+.chat-container > .main-container > .main-container-content > .main-container-content-bottombar {
+    grid-area: "chatTextArea";
+    width: 100%;
+    position:relative;
+    box-shadow: -1px -9px 103px -18px rgba(0,0,0,0.75);
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-bottombar > #main-container-bottombar-textbox{
+    margin: 5px;
+    border: none;
+    margin: 0;
+    height: 80%;
+    border-radius: 25px;
+    margin-top: 5px;
+    color: var(--text-color);
+    width: 100%;
+    background: var(--form-elements-background);
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-bottombar > #main-container-bottombar-btn-send{
+    font-weight: 100;
+    font-size: 32px;
+    color:#dfdfdf;
+    position:absolute;
+    right: 1%;
+    top:20%;
+    cursor: pointer;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-bottombar > #main-container-bottombar-btn-send:hover{
+    color:white;
+}
+/*-----FINE BOTTOM BAR --- MAIN ----*/
+/*-----INIZIO SIDEBAR CONTAINER --- MAIN ----*/
+.chat-container > .main-container > .main-container-sidebar {
+    justify-self: end;
+    display: none;
+    flex-direction: column;
+    width:30%;
+    gap: 4rem;
+    border-left: 1px solid var(--form-elements-background);
+}
+.chat-container > .main-container > .main-container-sidebar-active {
+    display: flex;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-image-container {
+    position:relative;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-image-container > #chat-container-main-container-sidebar-panorama-image{
+    width: 100%;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-image-container > #chat-container-main-container-sidebar-profile-image{
+    position:absolute;
+    width:150px;
+    border-radius: 50%;
+    border: 3px solid var(--form-elements-background-hover);
+    margin-left: auto;
+    margin-right: auto;
+    left:0;
+    right: 0;
+    bottom:-40px;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-text-container > h2{
+    font-size: 36px;
+}
+/*-----FINE SIDEBAR CONTAINER --- MAIN ----*/

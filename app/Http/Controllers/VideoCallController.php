@@ -63,7 +63,7 @@ class VideoCallController extends Controller
             "start_date" => $Conference->created_at,
             "chat_name" => $chat->description
         ];
-        return View::make("chat.webStart", compact("users", "objToken", "objConference"));
+        return View::make("chat.videocall", compact("users", "objToken", "objConference"));
     }
     public function startCall(Chat $Chat)
     {
@@ -80,7 +80,7 @@ class VideoCallController extends Controller
             "chat_name" => $Chat->description,
             "start_date" => $conference->created_at
         ];
-        return view("chat.webStart", compact("users", "objToken", "objConference"));
+        return view("chat.videocall", compact("users", "objToken", "objConference"));
     }
     //ConferenceCreation
     public function CreateConference($chatId, $userIdCollection)

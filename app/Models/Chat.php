@@ -114,7 +114,8 @@ class Chat extends Model
             foreach($chatPartecipant as $partecipantUser) {
                 $PartecipantColl[]=(object)array(
                     "user_id" => $partecipantUser->id,
-                    "user_name" => $partecipantUser->name
+                    "user_name" => $partecipantUser->name,
+                    "user_image" => $partecipantUser->profile->getProfileImage()
                 );
             }
             $item->toJson();

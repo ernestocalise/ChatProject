@@ -9,8 +9,8 @@ chatProject.chatPage = (function (me) {
     var _activeChatId = 0;
     var _arrCurrentChats = [];
     var _timeouts = {
-        checkChatChanged: 1000,
-        checkChatCount: 5000
+        checkChatChanged: 1,
+        checkChatCount: 5
     };
     var _selectors = {
         csrf_token: 'meta[name=csrf-token]',
@@ -171,6 +171,7 @@ chatProject.chatPage = (function (me) {
                 }, 1000
             );
             chatProject.fh.interface.hideLoader();
+            _scrollChatboxToBottom();
         } 
         chatProject.ajaxCall.getMessages(chatId, _successCallback);
     };
@@ -229,6 +230,7 @@ chatProject.chatPage = (function (me) {
             'messageId': messageId
         };
         let _successCallback = function(data) {
+            isChatboxScrolled = _checkIsScrolled();
             if(_activeChatId == chatId) {
                 data.messages.forEach( singleMessage => 
                     _addMessage(singleMessage)
@@ -244,6 +246,9 @@ chatProject.chatPage = (function (me) {
                 .join('');
             $(_selectors.sideBar.chatContainer.singleChatPreview(chatId)).html(`${userNameFirstLetters}: ${data.messages[data.messages.length-1].content}`);
             _moveChatOnTop($(_selectors.sideBar.chatContainer.chatDescriptorById(chatId)));
+            if(isChatboxScrolled){
+                _scrollChatboxToBottom();
+            }
         };
         chatProject.ajaxCall.updateChat(_data, _successCallback);
     };
@@ -256,9 +261,36 @@ chatProject.chatPage = (function (me) {
                 "chatId": _activeChatId,
                 "message": _message
             };
-            chatProject.ajaxCall.sendMessage(data, function() {}, function() {});
+
+            var _successCallback = function(messageComponentData) {
+                let _chatIndex = _arrCurrentChats.findIndex(currChat => currChat.chatId == messageComponentData.chatId);
+                _arrCurrentChats[_chatIndex].messageId = messageComponentData.message.messageId;
+                $(_selectors.sideBar.chatContainer.singleChatPreview(_activeChatId)).html(`${_texts["You"]}: ${messageComponentData.message.content}`);
+                _moveChatOnTop($(_selectors.sideBar.chatContainer.chatDescriptorById(_activeChatId)));
+                let isChatboxScrolled = _checkIsScrolled();
+                _addMessage(messageComponentData.message);
+                if(isChatboxScrolled){
+                    _scrollChatboxToBottom();
+                }
+            }
+            var _errorCallback = function(error) {
+                console.error(error);
+                console.error(error.toString());
+            }
+            chatProject.ajaxCall.sendMessage(data, _successCallback, _errorCallback);
         }
     };
+    var _scrollChatboxToBottom = function () {
+        $("#messageTarget").scrollTop($("#messageTarget")[0].scrollHeight);
+    }
+    var _checkIsScrolled = function() {
+        const item = document.getElementById("messageTarget");
+        const {scrollHeight, scrollTop, clientHeight} = item;
+        if (Math.abs(scrollHeight - clientHeight - scrollTop) < 1) {
+            return true;
+        }
+        return false;
+    }
     var _startVideoCall = function() {
         window.open(`/conference/show/${_activeChatId}`, "Videochiamata", "toolbar=0,location=0,menubar=0");
     }
@@ -319,14 +351,16 @@ chatProject.chatPage = (function (me) {
         let _chatParticipants = _arrCurrentChats.filter(x => x.chatId == _activeChatId)[0].partecipants;
         let _actualViewers = "";
         _chatParticipants.forEach(participant => {
-            if(_viewers.includes(participant.user_id)) {
-                if(_actualViewers != "")
-                    _actualViewers+=", ";
-                _actualViewers+=participant.user_name;
-            }
-            if(!_viewers.includes(_fromPhpPage.personalUserId)){
-                _viewers.push(_fromPhpPage.personalUserId);
-                chatProject.ajaxCall.setVisualizzation(message.messageId);
+            if(_viewers != null){
+                if(_viewers.includes(participant.user_id)) {
+                    if(_actualViewers != "")
+                        _actualViewers+=", ";
+                    _actualViewers+=participant.user_name;
+                }
+                if(!_viewers.includes(_fromPhpPage.personalUserId)){
+                    _viewers.push(_fromPhpPage.personalUserId);
+                    chatProject.ajaxCall.setVisualizzation(message.messageId);
+                }
             }
             if($(_selectors.chatBox.singleMessageById(message.messageId)).length)
                 return;

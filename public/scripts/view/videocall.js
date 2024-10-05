@@ -406,19 +406,24 @@ chatProject.videoCall = (function (me) {
         $(_selectors.streamWrapper.window).css("display","initial");
     }
     //Stream Controls
+    var _isCameraClickRunning = false;
     var _onBtnCameraClick = async function(e) {
-        
-        if(ClientConfiguration.WebcamSettings.IsCameraStreamEnabled ){
-           ClientConfiguration.removeVideoTrack(); 
-        } else {
-            if(ClientConfiguration.ScreenShareSettings.IsScreenShareEnabled)
-                ClientConfiguration.removeVideoTrack(); 
-            ClientConfiguration.LocalTracks.VideoTrack = await AgoraRTC.createCameraVideoTrack(ClientConfiguration.ClientConfigurationObject.GetWebcamConfigurationObject());
-            ClientConfiguration.LocalTracks.VideoTrack.play(`user-${ClientConfiguration.UID}`)
-            client.publish(ClientConfiguration.LocalTracks.VideoTrack);
-            ClientConfiguration.WebcamSettings.IsCameraStreamEnabled = true;
-            _updateBtnIcon(_selectors.streamWrapper.streamControls.btnCamera, _icons.streamControls.webcam, true);
-        }
+        if(_isCameraClickRunning)
+            return;
+            _isCameraClickRunning = true;
+            if(ClientConfiguration.WebcamSettings.IsCameraStreamEnabled ){
+               ClientConfiguration.removeVideoTrack(); 
+            } else {
+                if(ClientConfiguration.ScreenShareSettings.IsScreenShareEnabled)
+                    ClientConfiguration.removeVideoTrack(); 
+                ClientConfiguration.WebcamSettings.IsCameraStreamEnabled = true;
+    
+                ClientConfiguration.LocalTracks.VideoTrack = await AgoraRTC.createCameraVideoTrack(ClientConfiguration.ClientConfigurationObject.GetWebcamConfigurationObject());
+                ClientConfiguration.LocalTracks.VideoTrack.play(`user-${ClientConfiguration.UID}`)
+                client.publish(ClientConfiguration.LocalTracks.VideoTrack);
+                _updateBtnIcon(_selectors.streamWrapper.streamControls.btnCamera, _icons.streamControls.webcam, true);
+            }
+        _isCameraClickRunning = false;
     }
     var _onBtnScreenClick = async function(e) {
         if(ClientConfiguration.ScreenShareSettings.IsScreenShareEnabled){

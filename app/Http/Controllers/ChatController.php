@@ -83,6 +83,7 @@ class ChatController extends Controller
         $chatMessage->message = $message;
         $chatMessage->type = 1;
         $chatMessage->save();
+        return $chatMessage->getMessageComponentData();
     }
     public function getChatCount() {
         return DB::table("chat_user")
