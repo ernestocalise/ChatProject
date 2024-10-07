@@ -26,11 +26,13 @@
 .chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box {
     position:absolute;
     top:25%;
-    left:30%;
-    width:40%;
+    left:35%;
+    width:35%;
     height: 50%;
-    background-color: var(--form-elements-background);
-    border:1px solid var(--text-color);
+    background-color: transparent;
+    backdrop-filter: blur(10px);
+    /* var(--form-elements-background);*/
+    border:1px solid var(--form-elements-background-hover);
     border-radius: 10px;
     z-index: 150;
     display: flex;
@@ -44,8 +46,106 @@
     background: var(--form-elements-background);
     color: var(--text-color);
     font-size: 32px;
-    width: 86%;
+    width: 100%;
     border-radius: 10px;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-textbox {
+    height: 80px;
+    background: var(--form-elements-background);
+    color: var(--text-color);
+    font-size: 32px;
+    width: 100%;
+    border-radius: 10px;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > #chat-container-dialog-box-textbox-chat-name {
+    display: none;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    border: 1px solid var(--form-elements-background);
+    border-radius: 15px;
+    height: 100%;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;  
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 15px;
+    height: 60px;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element:hover,
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element:has(input[type="checkbox"]:checked) {
+    background: var(--background);
+}
+
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-personal-information {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 1.5rem;
+    height: 50px;
+    align-items: center;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 30px;
+    width: 30px;
+    background-color: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    margin-right: 0.5rem !important;
+    border:none;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-checkbox:after {
+    font-family: "Material Symbols Outlined";
+    content:"\e5ca";
+    font-weight: 900;
+    font-size: 20px;
+    color:white;
+    display: none;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-checkbox:focus {
+    outline: none;
+    border-color: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-checkbox:checked {
+    background-color: var(--form-elements-background-hover)
+}
+
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-personal-information > img {
+    height: 90%;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-search-result >.dialog-box-search-result-element > .dialog-box-search-result-element-personal-information > span {
+    color: var(--text-color);
+    font-weight: bolder;
+    cursor: pointer;
+}
+
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-btn-create-chat {
+    width: 30%;
+    background: var(--active);
+    padding: 1rem;
+    border-radius: 15px;
+    font-weight: bolder;
+    text-transform: uppercase;
+}
+.chat-container > .chat-container-dialog-box-container > .chat-container-dialog-box > .chat-container-dialog-box-btn-create-chat:hover {
+    opacity: 0.8;
 }
 
 /*-----FINE DIALOGBOX --- DIALOG ----*/
@@ -203,7 +303,7 @@ font-weight: bolder;
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container {
     width: 100%;
     overflow-y: scroll;
-    
+    overflow-x: hidden;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container::-webkit-scrollbar { width: 1em;}
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container::-webkit-scrollbar-track { background: var(--form-elements-background-hover)}
@@ -216,6 +316,7 @@ font-weight: bolder;
     padding:10px 10px 0px 5px;
     transition:all 1s ease;
     cursor:text;
+    max-width: 100%;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message:hover{
     background-color: var(--form-elements-background-hover);
@@ -275,6 +376,7 @@ font-weight: bolder;
 .chat-container > .main-container > .main-container-content > .main-container-content-bottombar > #main-container-bottombar-btn-send:hover{
     color:white;
 }
+
 /*-----FINE BOTTOM BAR --- MAIN ----*/
 /*-----INIZIO SIDEBAR CONTAINER --- MAIN ----*/
 .chat-container > .main-container > .main-container-sidebar {
@@ -309,8 +411,47 @@ font-weight: bolder;
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 .chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-text-container > h2{
     font-size: 36px;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-userlist-container 
+{
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:5px;
+    padding-right: 10px;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-userlist-container >.chat-container-sidebar-userlist-container-user {
+    display:flex;
+    flex-direction: row;
+    height: 60px;
+    justify-content: start;
+    padding:10px;
+    gap:1rem;
+    border-radius: 15px;
+    align-items: center;
+    cursor: pointer;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-userlist-container >.chat-container-sidebar-userlist-container-user:hover {
+    background: var(--form-elements-background);
+    
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-userlist-container >.chat-container-sidebar-userlist-container-user > img {
+    height: 90%;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.chat-container > .main-container > .main-container-sidebar > .chat-container-sidebar-userlist-container >.chat-container-sidebar-userlist-container-user > span {
+    color:var(--text-color);
+    font-weight: bolder;
+    cursor: pointer;
 }
 /*-----FINE SIDEBAR CONTAINER --- MAIN ----*/

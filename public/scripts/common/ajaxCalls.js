@@ -49,6 +49,9 @@ export function ajaxCall() {
         });
     }
     //Chat Functions: 
+    var _getAllUsers = function(successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest("/chats/getAllUsers", successCallback, errorCallback);
+    }
     var _setVisualizzation = function (messageId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/chats/setVisualizzation/${messageId}`, successCallback, errorCallback);
     };
@@ -81,6 +84,9 @@ export function ajaxCall() {
     var _addChat = function (data, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executePOSTRequest("/chats/addChat", data, successCallback, errorCallback);
     };
+    var _createGroupChat = function(data, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executePOSTRequest("/chats/createGroupChat", data, successCallback, errorCallback);
+    }
     var _checkChatCount = function (successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         $._executeGETRequest("/chats/getChatCount", successCallback, errorCallback);
     };
@@ -132,11 +138,13 @@ export function ajaxCall() {
             updateChat: _updateChat,
             sendMessage: _sendMessage,
             addChat: _addChat,
+            createGroupChat: _createGroupChat,
             checkChatCount: _checkChatCount,
             getStatus: _getStatus,
             setStatus: _setStatus,
             restoreStatus: _restoreStatus,
-            getUserInformation: _getUserInformation
+            getUserInformation: _getUserInformation,
+            getAllUsers: _getAllUsers
         },
         videoCall: {
             createConference: _createConference,

@@ -9,8 +9,41 @@
             <input type="text" class="chat-container-dialog-box-textbox" name="chat-container-dialog-box-textbox-chat-name" id="chat-container-dialog-box-textbox-chat-name" placeholder="Inserisci il nome della chat">
             <input type="text" class="chat-container-dialog-box-textbox" name="chat-container-dialog-box-search-box" id="chat-container-dialog-box-search-box" placeholder="Cerca..">
             <div class="chat-container-dialog-box-search-result" id="chat-container-dialog-box-search-result">
+                <div class="dialog-box-search-result-element" id="chat-container-search-result-element-1">
+                    <div class="dialog-box-search-result-element-personal-information">
+                        <img src="https://ui-avatars.com/api/?name=Test" alt="Test" class="chat-container-userlist-chatbox-image">
+                        <span>Test</span>
+                    </div>
+                    <input type="checkbox" name="dialog-box-search-result-element-checkbox" class="dialog-box-search-result-element-checkbox">
+                </div>
+                <div class="dialog-box-search-result-element" id="chat-container-search-result-element-1">
+                    <div class="dialog-box-search-result-element-personal-information">
+                        <img src="https://ui-avatars.com/api/?name=Test" alt="Test" class="chat-container-userlist-chatbox-image">
+                        <span>Test</span>
+                    </div>
+                    <input type="checkbox" name="dialog-box-search-result-element-checkbox" class="dialog-box-search-result-element-checkbox">
+                </div>
+
+                <div class="dialog-box-search-result-element" id="chat-container-search-result-element-1">
+                    <div class="dialog-box-search-result-element-personal-information">
+                        <img src="https://ui-avatars.com/api/?name=Test" alt="Test" class="chat-container-userlist-chatbox-image">
+                        <span>Test</span>
+                    </div>
+                    <input type="checkbox" name="dialog-box-search-result-element-checkbox" class="dialog-box-search-result-element-checkbox">
+                </div>
+
+                <div class="dialog-box-search-result-element" id="chat-container-search-result-element-1">
+                    <div class="dialog-box-search-result-element-personal-information">
+                        <img src="https://ui-avatars.com/api/?name=Test" alt="Test" class="chat-container-userlist-chatbox-image">
+                        <span>Test</span>
+                    </div>
+                    <input type="checkbox" name="dialog-box-search-result-element-checkbox" class="dialog-box-search-result-element-checkbox">
+                </div>
 
             </div>
+            <button class="chat-container-dialog-box-btn-create-chat" id="chat-container-dialog-box-btn-create-chat">
+                Crea Chat
+            </button>
         </div>
     </div>
 
@@ -75,6 +108,8 @@
                 <h2 id="chat-container-sidebar-text-container-profile-name"> Carlo Piero </h2>
                 <span id="chat-container-sidebar-text-container-skill-description">Programmatore</span>
                 <h3>{{__("Lavorando su")}} <a href="#" id="chat-container-sidebar-text-container-job-description">Test</a></h3>
+            </div>
+            <div id="chat-container-sidebar-userlist-container" class="chat-container-sidebar-userlist-container">
             </div>
         </div>
     </div>

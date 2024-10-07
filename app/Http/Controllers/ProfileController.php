@@ -85,7 +85,8 @@ class ProfileController extends Controller
         auth()->user()->setStatus($data["statusCode"]);
     }
     public function getUserInformation ($userId) {
-         $user = User::find($userId);
+        
+         $user = User::find((int)$userId);
          return (object)[
             "id" => $user->id,
             "username" => $user->name,

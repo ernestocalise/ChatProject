@@ -64,7 +64,8 @@ chatProject.chatPage = (function (me) {
                 profile_image: "#chat-container-main-container-sidebar-profile-image",
                 profile_name: "#chat-container-sidebar-text-container-profile-name",
                 skill_description: "#chat-container-sidebar-text-container-skill-description",
-                job_description: "#chat-container-sidebar-text-container-job-description"
+                job_description: "#chat-container-sidebar-text-container-job-description",
+                user_container: "#chat-container-sidebar-userlist-container"
             }
         },
         dialog: {
@@ -72,7 +73,16 @@ chatProject.chatPage = (function (me) {
             window: "#chat-container-dialog-box",
             txtSearch: "#chat-container-dialog-box-search-box",
             txtChatName: "#chat-container-dialog-box-textbox-chat-name",
-            searchResultContainer: "#chat-container-dialog-box-search-result" 
+            searchResultContainer: "#chat-container-dialog-box-search-result",
+            searchResultItem: {
+                allSearchResult: ".dialog-box-search-result-element",
+                allCheckboxes: ".dialog-box-search-result-element-checkbox",
+                searchResultById: function(id) {return "#chat-container-dialog-box-search-result-element-"+id },
+                searchResultImageById: function(id) {return "#chat-container-dialog-box-search-result-image-"+id },
+                searchResultSpanById: function(id) {return "#chat-container-dialog-box-search-result-span-"+id },
+                serchResultCheckboxById: function(id) {return "#chat-container-dialog-box-search-result-checkbox-"+id }
+            },
+            btnCreateChat : "#chat-container-dialog-box-btn-create-chat"
         }
     };    
     var _texts = {}
@@ -98,6 +108,7 @@ chatProject.chatPage = (function (me) {
         _timers.tmrCheckChatCount = chatProject.fh.time.timer("_checkChatCount", _checkChatCount, _timeouts.checkChatCount, false);
         _timers.tmrCheckChatChanged.start();
         _timers.tmrCheckChatCount.start();
+        _getAllUsers();
         _doBindings();
     };
     /* --- INIZIO FUNZIONI GRAFICHE --- */
@@ -149,9 +160,20 @@ chatProject.chatPage = (function (me) {
             }).slideDown(500);
         }
     }
+    var _moveDialogSearchResultOnTop = function(item) {
+        if(!$(item).is(":first-child")){
+            $(item).insertBefore($(this).siblings(':eq(0)'));
+        }
+    }
     var _scrollChatboxToBottom = function () {
         $(_selectors.chatContainer.main_container.chat_container.window)
         .scrollTop($(_selectors.chatContainer.main_container.chat_container.window)[0].scrollHeight);
+    }
+    var _createSidebarChatParticipantElement = function(user_id, user_name, user_image) {
+            return `<div class="chat-container-sidebar-userlist-container-user" id="chat-container-sidebar-userlist-container-user-${user_id}">
+                        <img src="${user_image}" alt="${user_name}" class="chat-container-userlist-chatbox-image">
+                        <span>${user_name}</span>
+                    </div>`;
     }
     /* --- FINE FUNZIONI GRAFICHE --- */
 
@@ -171,6 +193,16 @@ chatProject.chatPage = (function (me) {
 
     }
     var _lastChatMessageSender = null;
+    var _findInChatList = function() {
+        let keyword = $(_selectors.chatContainer.searchbar.txtSearchBar).val(); 
+        $(_selectors.chatContainer.user_list.allChatbox).each(function(index) {
+            if(!$(this).children("span").text().toString().toUpperCase().includes(keyword.toString().toUpperCase())){
+                $(this).css("display","none");
+            } else {
+                $(this).css("display","flex");
+            }
+        });
+    }
     var _findInChat = function() {
         let keyword = $(_selectors.chatContainer.topbar.action_container.search_bar).val(); 
         $(_selectors.chatContainer.main_container.chat_container.allMessage).each(function(index) {
@@ -181,7 +213,19 @@ chatProject.chatPage = (function (me) {
             }
         });
     }
-
+    var _findInDialog = function() {
+        let keyword = $(_selectors.dialog.txtSearch).val(); 
+        $(_selectors.dialog.searchResultItem.allSearchResult).each(function(index) {
+            if($(this).children("input").is(":checked")){
+                $(this).css("display", "flex");
+            }
+            else if(!$(this).children("div").children("span").text().toString().toUpperCase().includes(keyword.toString().toUpperCase())){
+                $(this).css("display","none");
+            } else {
+                $(this).css("display","flex");
+            }
+        });
+    }
     var _addMessage = function(message) {
         let _viewers = JSON.parse(message.viewed_from);
         let _chatParticipants = _arrCurrentChats.filter(x => x.chatId == _activeChatId)[0].partecipants;
@@ -195,7 +239,7 @@ chatProject.chatPage = (function (me) {
                 }
                 if(!_viewers.includes(_fromPhpPage.personalUserId)){
                     _viewers.push(_fromPhpPage.personalUserId);
-                    chatProject.ajaxCall.setVisualizzation(message.messageId);
+                    //chatProject.ajaxCall.setVisualizzation(message.messageId);
                 }
             }
         });
@@ -214,11 +258,74 @@ chatProject.chatPage = (function (me) {
         }
         return false;
     }
+    var _getDialogSearchResultCheckedUsers = function() {
+        let userColl = [];
+        $(_selectors.dialog.searchResultItem.allCheckboxes).each(function(index) {
+            if(this.checked){
+            userColl.push(this.value);
+            }
+            })
+            return userColl;
+    }
+
+    var _createSearchResultUser = function(user) {
+        return`<div class="dialog-box-search-result-element" id="chat-container-search-result-element-${user.id}">
+                    <div class="dialog-box-search-result-element-personal-information">
+                        <img src="${user.profileImage}" alt="${user.name}" class="chat-container-userlist-chatbox-image" id="chat-container-userlist-chatbox-image-${user.id}">
+                        <span>${user.name}</span>
+                    </div>
+                    <input type="checkbox" name="dialog-box-search-result-element-checkbox" class="dialog-box-search-result-element-checkbox" id="dialog-box-search-result-element-checkbox-${user.id}" value="${user.id}">
+                </div>`;
+    }
 
     /* --- FINE FUNZIONI LOGICHE
 
     /* --- INIZIO CHAMATE AJAX --- */
-    
+    var _createGroupChat = function(userIds, chatName) {
+        let data = {
+            "_token" : $(_selectors.csrf_token).attr("content"),
+            "userIds": userIds,
+            "chatName": chatName
+        };
+        let _successCallback = function(response){
+            let currChatCount = _arrCurrentChats.length;
+            _arrCurrentChats = [];
+            $(_selectors.chatContainer.user_list.window).html("");
+            $(_selectors.chatContainer.main_container.chat_container.window).html("");
+            _getChats(currChatCount > 0 ? true : false);
+            $(_selectors.dialog.background).css("display", "none");
+        }
+        chatProject.ajaxCall.createGroupChat(data, _successCallback);
+    }
+    var _getOrCreatePersonalChat = function(userId) {
+
+        let data = {
+            "_token" : $(_selectors.csrf_token).attr("content"),
+            "userId": userId
+        };
+        let successCallback = function(response) {
+            let chatIndex = _arrCurrentChats.findIndex(currChat => currChat.chatId == response);
+            if(chatIndex != -1){
+                chatProject.ajaxCall.getUserInformation(userId, function(user){
+                    _getMessages(
+                        response, 
+                        {
+                            user_image: user.profile_pic,
+                            user_name: user.username
+                        });
+                });
+            }
+            else {
+                let currChatCount = _arrCurrentChats.length;
+                _arrCurrentChats = [];
+                $(_selectors.chatContainer.user_list.window).html("");
+                $(_selectors.chatContainer.main_container.chat_container.window).html("");
+                _getChats(currChatCount > 0 ? true : false);
+            }
+            $(_selectors.dialog.background).css("display", "none");
+        };
+        chatProject.ajaxCall.addChat(data,successCallback);
+    }
     var _sendMessage = function() {
         let _message = $(_selectors.chatContainer.main_container.bottom_bar.txtMessage).val();
         if(!chatProject.fh.string.isStringEmpty(_message)) {
@@ -252,13 +359,25 @@ chatProject.chatPage = (function (me) {
         //Preparing ajax call
         var _successCallback = function(data) {
             $(_selectors.chatContainer.main_container.chat_container.window).html("");
+            $(_selectors.chatContainer.sidebar.user_container).html("");
             data.messages.forEach(message => _addMessage(message));
             if(!isPersonalChat){
                 $(_selectors.chatContainer.topbar.profile_container.chat_image).attr("src", data.chatImage);
                 $(_selectors.chatContainer.topbar.profile_container.chat_name).html(data.chatName);
+                $(_selectors.chatContainer.sidebar.profile_image).attr("src",data.chatImage);
+                $(_selectors.chatContainer.sidebar.profile_name).html(data.chatName);
+                data.participants.forEach(user => {
+                    $(_selectors.chatContainer.sidebar.user_container).append(_createSidebarChatParticipantElement(user.id, user.name, user.image));
+                });
+                $(_selectors.chatContainer.sidebar.user_container).css("display", "flex");
+
             } else {
                 $(_selectors.chatContainer.topbar.profile_container.chat_image).attr("src", isPersonalChat.user_image);
                 $(_selectors.chatContainer.topbar.profile_container.chat_name).html(isPersonalChat.user_name);
+                $(_selectors.chatContainer.sidebar.profile_image).attr("src", isPersonalChat.user_image);
+                $(_selectors.chatContainer.sidebar.profile_name).html(isPersonalChat.user_name);
+                $(_selectors.chatContainer.sidebar.user_container).css("display", "none");
+            
             }
             //_scrollChatboxToBottom();
         } 
@@ -268,6 +387,7 @@ chatProject.chatPage = (function (me) {
     var _getChats = function (openFirstChat = true) {
         var _successCallback = function(data) {
             let isFirst = true;
+            $(_selectors.chatContainer.user_list.window).html("");
             data.forEach(singleChat => {
                 let isPersonalChat = false;
                 if(!singleChat.groupChat) {
@@ -344,6 +464,23 @@ chatProject.chatPage = (function (me) {
         };
         chatProject.ajaxCall.updateChat(_data, _successCallback);
     };
+    var _getAllUsers = function() {
+        var _successCallback = function(userList) {
+            $(_selectors.dialog.searchResultContainer).html("");
+            if(Array.isArray(userList)) {
+                userList.forEach(user => {
+                    $(_selectors.dialog.searchResultContainer).append(_createSearchResultUser(user));
+                });
+            }
+            $(_selectors.dialog.searchResultItem.allSearchResult).each(function(){
+                $(this).on("click", _onDialogSearchResult_CheckBox_Click);
+            });
+        }
+        var _errorCallback = function(error) {
+            console.error(error);
+        }
+        chatProject.ajaxCall.getAllUsers(_successCallback, _errorCallback);
+    }
     /* --- INIZIO BINDINGS --- */
     var _onActionDetails_Click = function() {
         if(_isSidebarVisible){
@@ -355,6 +492,11 @@ chatProject.chatPage = (function (me) {
         _isSidebarVisible = true;
     }
     var _onSearchBarBtnAdd_Click = function() {
+        $(_selectors.dialog.txtChatName).val("");
+        $(_selectors.dialog.txtSearch).val("");
+        _findInDialog();
+        $(_selectors.dialog.searchResultItem.allCheckboxes).each(function() {this.checked = false;})
+        $(_selectors.dialog.txtChatName).css("display", "none");
         $(_selectors.dialog.background).css("display", "block");
     }
     var _closeChatDialog = function(event) {
@@ -362,18 +504,41 @@ chatProject.chatPage = (function (me) {
         $(_selectors.dialog.background).css("display", "none");
         
     }
+    var _onDialogSearchResult_CheckBox_Click = function() {
+        this.children[1].checked = !this.children[1].checked;
+        _moveDialogSearchResultOnTop(this)
+    }
+    var _onDialogSearchResult_btnCreateChat_Click = function() {
+        let userId = _getDialogSearchResultCheckedUsers();
+        if (!Array.isArray(userId))
+            return;
+        if(userId.length == 0)
+            return;
+        if(userId.length == 1)
+            return _getOrCreatePersonalChat(userId[0]);
+        let chatName = $(_selectors.dialog.txtChatName).val().toString().trim();
+        if(chatName != "")
+            return _createGroupChat(userId, $(_selectors.dialog.txtChatName).val()) 
+        $(_selectors.dialog.txtChatName).css("display", "flex");
+    }
     var _doBindings = function() {
         $(_selectors.chatContainer.topbar.action_container.action_details).on("click", _onActionDetails_Click);
         $(_selectors.chatContainer.topbar.action_container.action_call).on("click", _startVideoCall);
         $(_selectors.chatContainer.topbar.action_container.search_bar).on("input", _findInChat);
         $(_selectors.chatContainer.main_container.bottom_bar.btnSend).on("click", _sendMessage);
         $(_selectors.chatContainer.main_container.bottom_bar.txtMessage).keypress(function(e) {
-                if(e.which == 10 || e.which == 13) {
-                    _sendMessage();
-                }
+            if(e.which == 10 || e.which == 13) {
+                _sendMessage();
+            }
         });
         $(_selectors.chatContainer.searchbar.btnAdd).on("click", _onSearchBarBtnAdd_Click);
         $(_selectors.dialog.background).on("click", _closeChatDialog);
+        $(_selectors.dialog.searchResultItem.allSearchResult).each(function(){
+            $(this).on("click", _onDialogSearchResult_CheckBox_Click);
+        });
+        $(_selectors.dialog.btnCreateChat).on("click", _onDialogSearchResult_btnCreateChat_Click);
+        $(_selectors.dialog.txtSearch).on("input", _findInDialog);
+        $(_selectors.chatContainer.searchbar.txtSearchBar).on("input", _findInChatList);
     }
     /* --- FINE BINDINGS --- */
     me.initialize = _initialize;

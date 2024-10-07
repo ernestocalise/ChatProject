@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\VideoCallController;
 use App\Http\Controllers\VideoConferenceController;
+use App\Models\Chat;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,7 +28,8 @@ Route::get('/', function () {
 
 //Dashboard related
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+    return view("layouts.dashboard", compact("user"));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
@@ -64,12 +66,14 @@ if(config("application-cluster.chat_enabled")) {
         Route::get('/chats/getChats', function () {
             return App\Models\Chat::getChatsByUserId(auth()->user()->id);
         });
+        Route::get('/chats/getAllUsers', [ChatController::class, "getAllUsers"]);
         Route::get('/chats/getMessages/{chatId}', [ChatController::class, 'getChatMessages']);
         Route::get('/chats/getChatCount', [ChatController::class, 'getChatCount']);
         Route::post('/chats/checkChatChanged', [ChatController::class, 'checkChatChanged']);
         Route::post('/chats/getNewMessages',  [ChatController::class, 'getNewMessages']);
         Route::post('/chats/sendMessage',  [ChatController::class, 'sendMessage']);
         Route::post('/chats/addChat', [ChatController::class, 'openOrCreateChat']);
+        Route::post('/chats/createGroupChat', [ChatController::class, 'createGroupChat']);
         Route::post('/chats/addAttachment', [ChatController::class, 'uploadFile']);
         Route::get('/chats/setVisualizzation/{messageId}', [ChatController::class, "setVisualizzation"]);
     }); 

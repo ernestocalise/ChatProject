@@ -19,7 +19,9 @@ class Chat extends Model
         $userColl = [];
         
         foreach($chat_users as $id) {
-            $userColl[]= \App\Models\User::where('id', '=', $id->user_id)->first();
+            $user = \App\Models\User::where('id', '=', $id->user_id)->first();
+            $user->image = $user->profileImage();
+            $userColl[]=$user;
         }
         return $userColl;
     }
@@ -70,6 +72,7 @@ class Chat extends Model
         $returnObject = (object)[
             "chatName" => $this->description,
             "chatImage" => $this->getImage(),
+            "participants" => $this->getParticipants(),
             "messages" => $messageColl
         ];
         return $returnObject;

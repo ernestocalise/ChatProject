@@ -44,10 +44,26 @@ class ChatController extends Controller
             $chat->save();
             $chat->addUser(auth()->user()->id);
             $chat->addUser($targetUserId);
-            $chat->sendSystemMessage("Chat Created by ".auth()->user()->name);
+            $chat->sendSystemMessage("Chat Created");
             return $chat->id;
         }
     }
+    public function createGroupChat (Request $request) {
+         $data = $request->validate([
+            "userIds" => "required|array",
+            "chatName" => "required|string"
+         ]);
+         $collUserIds = array_merge($data["userIds"], [auth()->user()->id]);
+         $chat = new Chat();
+         $chat->groupChat = true;
+         $chat->description = $data["chatName"];
+         $chat->save();
+         foreach($collUserIds as $userId){
+            $chat->addUser($userId);
+         }
+         $chat->sendSystemMessage("Chat Created");
+         return $chat->id;
+        }
     public function checkChatChanged(Request $request) {
         $data = $request->validate([
             "chatId" => "required|numeric",
@@ -59,6 +75,18 @@ class ChatController extends Controller
         return (object)[
             "chatChanged" => !($chat->getLastMessageAttribute()->messageId == $lastMessageId)
         ];
+    }
+    public function getAllUsers () {
+         $allUsers = User::all()->except(auth()->user()->id)->except(0);
+         $userColl = [];
+         foreach($allUsers as $user) {
+            $userColl[]=(object)[
+                "id" => $user->id,
+                "name" => $user->name,
+                "profileImage" => $user->profileImage()
+            ];
+         }
+         return $userColl;
     }
     public function getNewMessages(Request $request) {
         $data = $request->validate([
