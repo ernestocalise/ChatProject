@@ -323,14 +323,16 @@ font-weight: bolder;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfo{
     max-height: 40px;
-    display: flex;
+    display:none;
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
-    display:none;
     padding-left:10px;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfoVisible {
+    display:flex !important;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container-FINDON >.chat-container-main-container-chat-message > .profileInfo {
     display:flex !important;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .profileInfo > img{
@@ -343,9 +345,35 @@ font-weight: bolder;
 }
 .chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span{
     padding-left:60px;
+    display: flex;
+    justify-content: space-between;
 }
-
-/*-----FINE MAIN CONTAINER --- MAIN ----*/
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span > small {
+    display:none;
+    margin-right: 30px;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span:has(span) > small {
+    display:initial !important;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .chat-container-userlist-chatbox-visualizzation {
+    display: flex;
+    gap: 0.5rem;
+    z-index: 0;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > .chat-container-userlist-chatbox-visualizzation > img {
+    width: 15px;
+    border-radius: 50px;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span:has(span) {
+    font-weight: bolder;
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message > span > span.call-started {
+    color:var(--color-add);
+}
+.chat-container > .main-container > .main-container-content > .main-container-content-chat-container >.chat-container-main-container-chat-message:hover > span > small {
+    display:initial;
+}
+    /*-----FINE MAIN CONTAINER --- MAIN ----*/
 /*-----INIZIO BOTTOM BAR --- MAIN ----*/
 .chat-container > .main-container > .main-container-content > .main-container-content-bottombar {
     grid-area: "chatTextArea";

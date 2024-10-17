@@ -23,16 +23,29 @@ class VideoConferenceController extends Controller
             ->where("created_at", ">", Carbon::now()->subSecond(30))->exists();
         $soundCalls = SoundCall::where("target_id", auth()->user()->id)
             ->where("hasAnswered", "0")
-            ->where("created_at", ">", Carbon::now()->subSecond(30))->get();
-
+            ->where("created_at", ">", Carbon::now()->subSecond(30))
+            ->get();
+            $soundCallArray = [];
+            foreach($soundCalls as $soundCall){
+                $soundCallArray[]= $soundCall->getProfileData();
+            }
         return (object)[
             "status" => $soundCallsExists,
-            "data" => $soundCalls
+            "data" => $soundCallArray
         ];
     }
 
     //Starting a call
- 
+    public function setIncomingSoundCallAnswerStatus ($soundCallId, $status) {
+        try {
+            $soundCall = SoundCall::find($soundCallId);
+             $soundCall->hasAnswered = $status;
+             $soundCall->save();
+             return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
     public function CreateSoundCall(Request $request)
     {

@@ -87,6 +87,22 @@
          @include('profile.edit')
     </div>
 </div>
+<div class="layout-panel-incoming-call" id="layout-panel-incoming-call">
+    <img src="https://thispersondoesnotexist.com/" class="layout-panel-incoming-call-image" id="layout-panel-incoming-call-image">
+    <span class="layout-panel-incoming-call-name" id="layout-panel-incoming-call-name">Claudio</span>
+    <div class="layout-panel-incoming-call-btnContainer">
+        <button class="layout-panel-incoming-call-btn layout-panel-incoming-call-btnAnswer" id="layout-panel-incoming-call-btnAnswer">
+            <span class="material-symbols-outlined">
+            call
+            </span>
+        </button>
+        <button class="layout-panel-incoming-call-btn layout-panel-incoming-call-btnCancel" id="layout-panel-incoming-call-btnCancel">
+            <span class="material-symbols-outlined">
+                call_end
+                </span>
+        </button>
+    </div>
+</div>
 </body>
 <script>
     //Getting PhpVariables to Single Components
@@ -100,4 +116,7 @@
     document.getElementById("hidden-components-data").value =dataForComponents_Value 
 
 </script>
+<audio controls loop autostart="0" autostart="false" preload="none" id="chatRingSound">
+    <source src="/sounds/call.mp3" type="audio/mp3">
+</audio>
 </html>

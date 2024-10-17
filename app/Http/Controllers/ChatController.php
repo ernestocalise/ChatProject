@@ -119,10 +119,16 @@ class ChatController extends Controller
         ->where("user_id", "=", auth()->user()->id)
         ->get();
     }
-    public function setVisualizzation($messageId) {
-        $data = validator(compact("messageId"), ["messageId" => "required|numeric"])->validate();
-        $message = ChatMessage::find($data["messageId"]);
-        $message->SetVisualizzation();
+    public function GetVisualizzation($chatId) {
+        $data = validator(compact("chatId"), ["chatId" => "required|numeric"])->validate();
+        $chat = Chat::find($data["chatId"]);
+        return $chat->GetVisualizzations();
+    }
+    public function SetVisualizzation ($chatId) {
+        $data = validator(compact("chatId"), ["chatId" => "required|numeric"])->validate();
+        $chat = Chat::find($data["chatId"]);
+        return $chat->SetVisualizzation();
+        
     }
     public function uploadFile(Request $request) {
         $data = $request->validate(

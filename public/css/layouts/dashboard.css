@@ -246,3 +246,48 @@
     opacity: 1;
   }
   #layout-panel-chat::-webkit-scrollbar { width: 0 !important }
+  /* END MAIN & PANELS */
+  /* START INCOMING CALL */
+  .layout-panel-incoming-call {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    width: 20rem;
+    background: var(--form-elements-background);
+    padding: 1rem;
+    border-radius: 25px;
+  }
+  .layout-panel-incoming-call-image {
+    width: 4rem;
+    border-radius: 50px;
+  }
+  .layout-panel-incoming-call-btn {
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    justify-content: center;
+  }
+  .layout-panel-incoming-call-btnAnswer {
+    background: var(--color-add);
+  }
+  .layout-panel-incoming-call-btn:hover {
+    opacity: 0.7;
+  }
+  .layout-panel-incoming-call-btnCancel {
+    background: var(--color-danger);
+  }
+  .layout-panel-incoming-call-btnContainer {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    gap: 1rem;
+  }
+  /* END INCOMING CALL */

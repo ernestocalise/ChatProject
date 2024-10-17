@@ -74,12 +74,13 @@ class VideoCallController extends Controller
             $userIdColleciton[]=$user->id;
         }
         $conference = $this->CreateConference($Chat->id, $userIdColleciton);
-
+        $conference->CreateSoundCall();
         $objToken = $this->getToken("Channel-{$conference->id}");
         $objConference = (object)[
             "chat_name" => $Chat->description,
             "start_date" => $conference->created_at
         ];
+        $Chat->sendSystemMessage("Call started by ".auth()->user()->name);
         return view("chat.videocall", compact("users", "objToken", "objConference"));
     }
     //ConferenceCreation

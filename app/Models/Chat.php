@@ -163,4 +163,16 @@ class Chat extends Model
         ];
         return $returnObject;
     }
+    public function GetVisualizzations() {
+        return DB::table("chat_user")
+        ->select("user_id","last_viewed_message_id")
+        ->where("chat_id",$this->id)->get();
+        
+    }
+    public function SetVisualizzation(){
+        DB::table("chat_user")
+        ->where("chat_id",$this->id)
+        ->where("user_id", auth()->user()->id)
+        ->update(["last_viewed_message_id" => $this->getMessages->last()->id]);   
+    }
 }

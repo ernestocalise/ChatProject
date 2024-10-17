@@ -75,7 +75,8 @@ if(config("application-cluster.chat_enabled")) {
         Route::post('/chats/addChat', [ChatController::class, 'openOrCreateChat']);
         Route::post('/chats/createGroupChat', [ChatController::class, 'createGroupChat']);
         Route::post('/chats/addAttachment', [ChatController::class, 'uploadFile']);
-        Route::get('/chats/setVisualizzation/{messageId}', [ChatController::class, "setVisualizzation"]);
+        Route::get('/chats/getVisualizzation/{chatId}', [ChatController::class, 'GetVisualizzation']);
+        Route::get('/chats/setVisualizzation/{chatId}', [ChatController::class, "SetVisualizzation"]);
     }); 
     //VideoChat Functions
     Route::middleware('auth')->group(function () {
@@ -86,8 +87,8 @@ if(config("application-cluster.chat_enabled")) {
         Route::get("/videoCall/start/{channelName}", [VideoCallController::class, "getToken"]);
         //Creating Conference
         Route::post('/conference/create', [VideoConferenceController::class, 'CreateConference']);
-        Route::post('/conference/CreateSoundCall', [VideoConferenceController::class, 'CreateSoundCall']);
-        Route::post("/conference/checkIncomingSoundCall", [VideoConferenceController::class, "checkIncomingSoundCall"]);
+        Route::get("/conference/checkIncomingSoundCall", [VideoConferenceController::class, "checkIncomingSoundCall"]);
+        Route::get("/conference/setIncomingSoundCallAnswerStatus/{soundCallId}/{status}", [VideoConferenceController::class, "setIncomingSoundCallAnswerStatus"]);
         Route::post("/conference/getParticipants", [VideoConferenceController::class, "GetConferenceParticipants"]);
     });
 }

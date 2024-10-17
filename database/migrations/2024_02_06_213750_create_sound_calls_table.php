@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('conference_id');
             $table->unsignedBigInteger('caller_id');
             $table->unsignedBigInteger('target_id');
-            $table->boolean('hasAnswered')->default('0');
+            $table->integer('hasAnswered')->default('0');
             $table->timestamps();
             $table->foreign('conference_id')->references('id')->on('conferences')->onDelete('cascade');
             $table->foreign('caller_id')->references('id')->on('users')->onDelete('cascade');

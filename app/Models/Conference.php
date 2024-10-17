@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Builder;
 class Conference extends Model
 {
     use HasFactory;
-    
+    public function chat () {
+         return $this->belongsTo(Chat::class);
+    }
     public function videoChatDocuments() {
         return $this->hasMany(VideochatDocument::class);
     }
@@ -52,6 +54,19 @@ class Conference extends Model
                 $videoChatDocument->save();
                 return $videoChatDocument;
             }
+        }
+    }
+    public function CreateSoundCall () {
+        $ConferenceUsers = DB::table('conference_user')
+            ->selectRaw('user_id')
+            ->where('conference_id', '=', $this->id)
+            ->where('user_id', "!=", auth()->user()->id)
+            ->get();
+    
+    foreach($ConferenceUsers as $targetId) {
+            $soundCall = new SoundCall();
+            $soundCall->setupCall($this->id, auth()->user()->id, $targetId->user_id);
+            $soundCall->save();
         }
     }
 }

@@ -52,8 +52,11 @@ export function ajaxCall() {
     var _getAllUsers = function(successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest("/chats/getAllUsers", successCallback, errorCallback);
     }
-    var _setVisualizzation = function (messageId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
-        _executeGETRequest(`/chats/setVisualizzation/${messageId}`, successCallback, errorCallback);
+    var _setVisualizzation = function (chatId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/chats/setVisualizzation/${chatId}`, successCallback, errorCallback);
+    };
+    var _getVisualizzation = function (chatId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/chats/getVisualizzation/${chatId}`, successCallback, errorCallback);
     };
     var _getMessages = function (chatId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/chats/getMessages/${chatId}`, successCallback, errorCallback);
@@ -110,16 +113,16 @@ export function ajaxCall() {
     }
 
     // VideoChatFunction
-    var _setVisualizzation = function (messageId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
-        _executeGETRequest(`/chats/setVisualizzation/${messageId}`, successCallback, errorCallback);
-    };
     var _getUserInformation = async function(userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         return  _executeGETRequest(`/user/getUserInformation/${userId}`, successCallback, errorCallback )
     }
-    var _checkIncomingSoundCall = async function(params) {
-        return _executeAsyncPOSTRequest("/conference/checkIncomingSoundCall", params);
+    var _checkIncomingSoundCall = async function( successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        return _executeGETRequest("/conference/checkIncomingSoundCall",successCallback, errorCallback);
     }
-    var _createSoundCall = async function (params) {
+    var _setIncomingSoundCallAnswerStatus = async function (soundCallId, status, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        return _executeGETRequest(`/conference/setIncomingSoundCallAnswerStatus/${soundCallId}/${status}`, successCallback, errorCallback);
+    }
+        var _createSoundCall = async function (params) {
         return _executeAsyncPOSTRequest("/conference/CreateSoundCall", params);
     }
     var _createConference = async function (params) {
@@ -131,6 +134,7 @@ export function ajaxCall() {
     return {
         chat: {
             setVisualizzation: _setVisualizzation,
+            getVisualizzation: _getVisualizzation,
             getMessages: _getMessages,
             getChats: _getChats,
             uploadFile: _uploadFile,
@@ -151,6 +155,7 @@ export function ajaxCall() {
             getConferenceParticipants: _getConferenceParticipants,
             createSoundCall: _createSoundCall,
             checkIncomingSoundCall: _checkIncomingSoundCall,
+            setIncomingSoundCallAnswerStatus: _setIncomingSoundCallAnswerStatus
         },
         email: {
             getFolders: _getFolders,

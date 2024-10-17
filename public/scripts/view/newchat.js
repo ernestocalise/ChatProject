@@ -8,9 +8,14 @@ chatProject.fh = global();
 chatProject.chatPage = (function (me) {
     var _activeChatId = 0;
     var _arrCurrentChats = [];
+    var _userProfiles = [];
+    var _userVisualizzation = {
+
+    };
     var _timeouts = {
         checkChatChanged: 1,
-        checkChatCount: 5
+        checkChatCount: 5,
+        checkVisualizzation: 5
     };
     var _componentsData = {
         user: {
@@ -90,7 +95,8 @@ chatProject.chatPage = (function (me) {
     var _timers = {
         tmrCheckChatChanged: null,
         tmrCheckChatCount: null,
-        tmrUploadFile: null
+        tmrUploadFile: null,
+        tmrVisualizzation: null
     };
     var _isSidebarVisible = false;
     var  _getUserComponentsData = function(){
@@ -108,6 +114,8 @@ chatProject.chatPage = (function (me) {
         _timers.tmrCheckChatCount = chatProject.fh.time.timer("_checkChatCount", _checkChatCount, _timeouts.checkChatCount, false);
         _timers.tmrCheckChatChanged.start();
         _timers.tmrCheckChatCount.start();
+        _timers.tmrVisualizzation = chatProject.fh.time.timer("_tmrCheckVisualizzation", _checkVisualizzation, _timeouts.checkVisualizzation, false);
+        _timers.tmrVisualizzation.start();
         _getAllUsers();
         _doBindings();
     };
@@ -119,15 +127,30 @@ chatProject.chatPage = (function (me) {
                 </div>`;
     }
     var _createMessageItem = function(message, viewers) {
+        let date_message_sent = new Date(message.sent_at);
+        let strFullDate = `${date_message_sent.getDate().toString().padStart(2,"0")}/${(date_message_sent.getMonth()+1).toString().padStart("00")}/${date_message_sent.getFullYear()} ${date_message_sent.getHours().toString().padStart("00")}:${date_message_sent.getMinutes().toString().padStart("00")}:${date_message_sent.getSeconds().toString().padStart("00")}`;
         if(message.sender == "SYSTEM") {
-            return `<div class="chat-container-main-container-chat-message" id="chat-container-main-container-chat-message-${message.messageId}">
-            <div class="profileInfo profileInfoVisible">
-            <img src="https://ui-avatars.com/api/?name=SYSTEM" alt="SYSTEM" class="chat-container-userlist-chatbox-image">
-            <span>SYSTEM</span>
-            </div>
-            <span>${message.content}</span>
-            </div>`;
-        } 
+
+                if(message.content.toUpperCase().includes("CHAT CREATED")) //Chat Created
+                return "";
+                /*`<div class="chat-container-main-container-chat-message" id="chat-container-main-container-chat-message-${message.messageId}">
+                <div class="profileInfo profileInfoVisible">
+                <img src="https://ui-avatars.com/api/?name=SYSTEM" alt="SYSTEM" class="chat-container-userlist-chatbox-image">
+                <span>SYSTEM</span>
+                </div>
+                <span>${message.content}</span>
+                </div>`;*/
+                if(message.content.toUpperCase().includes("CALL STARTED")) //CALL STARTED
+                return `<div class="chat-container-main-container-chat-message" id="chat-container-main-container-chat-message-${message.messageId}">
+                            <span>
+                                <span class="material-symbols-outlined call-started">
+                                    call
+                                </span>
+                                ${message.content}
+                                <small>${strFullDate}</small>
+                            </span>
+                        </div>`;
+            } 
         let isProfileInfoVisible = "profileInfoVisible"
         if(_lastChatMessageSender != null && _lastChatMessageSender == message.sender)
             isProfileInfoVisible = "";
@@ -136,10 +159,11 @@ chatProject.chatPage = (function (me) {
             case 1: //text message
                 return `<div class="chat-container-main-container-chat-message" id="chat-container-main-container-chat-message-${message.messageId}">
                 <div class="profileInfo ${isProfileInfoVisible}">
-                 <img src="${message.senderImage}" alt="SYSTEM" class="chat-container-userlist-chatbox-image">
+                 <img src="${message.senderImage}" alt="${message.sender}'s profile image" class="chat-container-userlist-chatbox-image">
                     <span>${message.sender}</span>
                 </div>
-                <span>${message.content}</span>
+                <span>${message.content}<small>${strFullDate}</small></span>
+                <div class="chat-container-userlist-chatbox-visualizzation" id="chat-container-userlist-chatbox-visualizzation-${message.messageId}"></div>
                 </div>`;
             case 2: //Image
             return "" //TODO
@@ -205,6 +229,15 @@ chatProject.chatPage = (function (me) {
     }
     var _findInChat = function() {
         let keyword = $(_selectors.chatContainer.topbar.action_container.search_bar).val(); 
+        let chatBoxConatainer = $(_selectors.chatContainer.main_container.chat_container.window);
+        if(keyword != ""){
+            if(!chatBoxConatainer.hasClass("main-container-content-chat-container-FINDON"))
+                chatBoxConatainer.addClass("main-container-content-chat-container-FINDON")
+        }
+        else
+        if(chatBoxConatainer.hasClass("main-container-content-chat-container-FINDON"))
+            chatBoxConatainer.removeClass("main-container-content-chat-container-FINDON")
+
         $(_selectors.chatContainer.main_container.chat_container.allMessage).each(function(index) {
             if(!$(this).children("span").text().toString().toUpperCase().includes(keyword.toString().toUpperCase())){
                 $(this).css("display","none");
@@ -311,7 +344,8 @@ chatProject.chatPage = (function (me) {
                         response, 
                         {
                             user_image: user.profile_pic,
-                            user_name: user.username
+                            user_name: user.username,
+                            user_id: userId
                         });
                 });
             }
@@ -361,17 +395,23 @@ chatProject.chatPage = (function (me) {
             $(_selectors.chatContainer.main_container.chat_container.window).html("");
             $(_selectors.chatContainer.sidebar.user_container).html("");
             data.messages.forEach(message => _addMessage(message));
+            _userProfiles = [];
+            _setVisualizzation();
             if(!isPersonalChat){
                 $(_selectors.chatContainer.topbar.profile_container.chat_image).attr("src", data.chatImage);
                 $(_selectors.chatContainer.topbar.profile_container.chat_name).html(data.chatName);
                 $(_selectors.chatContainer.sidebar.profile_image).attr("src",data.chatImage);
                 $(_selectors.chatContainer.sidebar.profile_name).html(data.chatName);
                 data.participants.forEach(user => {
+                    if(user.id != _componentsData.user.userID){
+                        _userProfiles.push({user_name: user.name, user_image: user.image, user_id:user.id});
+                    }
                     $(_selectors.chatContainer.sidebar.user_container).append(_createSidebarChatParticipantElement(user.id, user.name, user.image));
                 });
                 $(_selectors.chatContainer.sidebar.user_container).css("display", "flex");
 
             } else {
+                _userProfiles.push({user_name: isPersonalChat.user_name, user_image:  isPersonalChat.user_image, user_id:isPersonalChat.user_id})
                 $(_selectors.chatContainer.topbar.profile_container.chat_image).attr("src", isPersonalChat.user_image);
                 $(_selectors.chatContainer.topbar.profile_container.chat_name).html(isPersonalChat.user_name);
                 $(_selectors.chatContainer.sidebar.profile_image).attr("src", isPersonalChat.user_image);
@@ -384,6 +424,30 @@ chatProject.chatPage = (function (me) {
         chatProject.ajaxCall.getMessages(chatId, _successCallback);
  
     }
+    var updateUserVisualizzationImage = function(userId) {
+        $(`chat-container-main-container-visualizzation-${userId}`).remove();
+        let _userProfile = _userProfiles.find(profile => {return profile.user_id == userId});
+        let _userProfileImage = _userProfile.user_image;
+        $("#chat-container-userlist-chatbox-visualizzation-"+_userVisualizzation[`user_${userId}`]).append(
+            `<img id="chat-container-main-container-visualizzation-${userId}" src="${_userProfileImage}" />` 
+        );
+    }
+    var _checkVisualizzation = function() {
+        if(_activeChatId == 0 || _activeChatId == null) return;
+        var _successCallback = function(data){
+            data.forEach(chat_user => {
+                if(chat_user.user_id != _componentsData.user.userId && (!_userVisualizzation.hasOwnProperty(`user_${chat_user.user_id}`) || !_userVisualizzation[`user_${chat_user.user_id}`] == chat_user.last_viewed_message_id))
+                {
+                    _userVisualizzation[`user_${chat_user.user_id}`] = chat_user.last_viewed_message_id;
+                    updateUserVisualizzationImage(chat_user.user_id);
+                }
+                })
+        }
+        chatProject.ajaxCall.getVisualizzation(_activeChatId, _successCallback);
+    }
+    var _setVisualizzation = function() {
+        chatProject.ajaxCall.setVisualizzation(_activeChatId);
+    }
     var _getChats = function (openFirstChat = true) {
         var _successCallback = function(data) {
             let isFirst = true;
@@ -394,7 +458,8 @@ chatProject.chatPage = (function (me) {
                     let participantTarget = singleChat.partecipants.find(partecipant => partecipant.user_id != _componentsData.user.userId)
                     isPersonalChat = {
                         user_image: participantTarget.user_image,
-                        user_name: participantTarget.user_name
+                        user_name: participantTarget.user_name,
+                        user_id: participantTarget.user_id
                     }
                 }
 
