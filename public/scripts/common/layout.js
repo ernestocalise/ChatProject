@@ -9,11 +9,13 @@ chatProject.layout = (function (me) {
         panels: {
             profilePanel: "#layout-panel-profile",
             chatPanel: "#layout-panel-chat",
+            emailPanel: "#layout-panel-email",
             allPanels: ".layout-panel"
         },
         menu_items: {
             profile_btn: "#profile-btn" ,
             chat_btn:"#chat-btn",
+            email_btn: "#email-btn",
             allMenuItems: ".layout-menu-bar-menu-item"
         },
         panel_incoming_call: {
@@ -118,6 +120,10 @@ chatProject.layout = (function (me) {
         _setPanelVisible(_selectors.panels.chatPanel);
         _setMenubarButtonActive(_selectors.menu_items.chat_btn);
     }
+    var _btnEmail_Click = function() {
+        _setPanelVisible(_selectors.panels.emailPanel);
+        _setMenubarButtonActive(_selectors.menu_items.email_btn);
+    }
     var _btnAnswerCall_Click = function() {
         chatProject.ajaxCall.setIncomingSoundCallAnswerStatus(_soundCallPlaying_SoundCallId,1);
         window.open(`/conference/show/${_soundCallPlaying_CallId}`, "Videochiamata", "toolbar=0,location=0,menubar=0");
@@ -127,9 +133,11 @@ chatProject.layout = (function (me) {
         chatProject.ajaxCall.setIncomingSoundCallAnswerStatus(_soundCallPlaying_SoundCallId,2);
         _resetIncomingCallAnswer();
     }
+
     var _doBindings = function() {
         $(_selectors.menu_items.profile_btn).on("click", _btnProfile_Click);
         $(_selectors.menu_items.chat_btn).on("click", _btnChat_Click);
+        $(_selectors.menu_items.email_btn).on("click", _btnEmail_Click);
         $(_selectors.panel_incoming_call.btnAnswer).on("click", _btnAnswerCall_Click);
         $(_selectors.panel_incoming_call.btnCancel).on("click", _btnCancelCall_Click);
     }

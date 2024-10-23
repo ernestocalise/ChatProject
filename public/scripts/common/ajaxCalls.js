@@ -106,7 +106,7 @@ export function ajaxCall() {
         _executeGETRequest(`/user/getStatus/${userId}`, successCallback, errorCallback);
     };
     var _getFolders = function (successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
-        _executeGETRequest(`/getFolders`, successCallback, errorCallback);
+        _executeGETRequest(`/email/getFolders`, successCallback, errorCallback);
     }
     var _getMailbox = function (mailboxId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/getMailbox/${mailboxId}`, successCallback, errorCallback)

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\EmailManager;
 use App\Http\Controllers\VideoCallController;
 use App\Http\Controllers\VideoConferenceController;
 use App\Models\Chat;
@@ -95,6 +96,9 @@ if(config("application-cluster.chat_enabled")) {
 
 //Email Application
 Route::middleware("auth")->group(function() {
+    Route::get("/email/test", [EmailManager::class, "runTests"]);
+    Route::get("/email/getFolders", [EmailManager::class, "GetFolders"]);
+
     Route::get("/email", [EmailController::class, "index"])->name("email");
     Route::get("/getFolders", [EmailController::class, "getFolders"]);
     Route::get("/getMailbox/{FolderId}/{orderBy?}/{startPosition?}/{endPosition?}",[EmailController::class, "getMailbox"]);

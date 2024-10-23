@@ -25,7 +25,7 @@
                 <p>{{ __('Dashboard') }}</p>
             </div>
         </a>
-        <a href="#" class="layout-menu-bar-menu-item">
+        <a href="#" class="layout-menu-bar-menu-item" id="email-btn">
             <span class="material-symbols-outlined">
                 mail
             </span>
@@ -86,6 +86,12 @@
     <div class="layout-panel" id="layout-panel-profile">
          @include('profile.edit')
     </div>
+    <div class="layout-panel" id="layout-panel-email">
+        @include('email.index')
+    </div>
+   <!-- <template shadowrootmode="open">
+        <html><head><style>.main-container{background:red !important; position:absolute; top:0; left:0; }</style></head><p class="main-container">Ciaop</p></html>
+      </template> -->
 </div>
 <div class="layout-panel-incoming-call" id="layout-panel-incoming-call">
     <img src="https://thispersondoesnotexist.com/" class="layout-panel-incoming-call-image" id="layout-panel-incoming-call-image">
@@ -103,6 +109,7 @@
         </button>
     </div>
 </div>
+
 </body>
 <script>
     //Getting PhpVariables to Single Components
@@ -110,6 +117,7 @@
         user: {
             userId: {{auth()->user()->id}},
             status: {{auth()->user()->getStatus()}},
+            isMailConfigurationValid: JSON.parse(`{!!auth()->user()->profile->isMailConfigurationValid()!!}`)
         }
     }
     let dataForComponents_Value = JSON.stringify(dataForComponents);
@@ -119,4 +127,6 @@
 <audio controls loop autostart="0" autostart="false" preload="none" id="chatRingSound">
     <source src="/sounds/call.mp3" type="audio/mp3">
 </audio>
+
+
 </html>
