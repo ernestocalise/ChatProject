@@ -64,56 +64,41 @@ chatProject.emailPage = (function (me) {
                 console.log(_componentsData);
             }, 100);
     };
-    var _getFolderStructure = function (inputFolderArray){
 
-        var _checkFolderExists = function(folderName, folderArray){
-            let folder = folderArray.find(item => item.name == folderName);
-            return typeof folder == "undefined"
-        } 
+    var _buildPaths = function (paths, separator) {
+        let result = [];
+        let level = {result};
 
-        inputFolderArray.forEach(
-            (Folder, index) => {
-                if(Folder.attributes != 64){
-                    if(Folder.shortpath.includes(Folder.delimiter)){
-                        var _fs = Folder.shortpath.split(Folder.delimiter)
-                        var _currentFolder = null;
-                        _fs.forEach(singleFolder => {
-                            if(_currentFolder == null)
-                                _currentFolder = _folderStructure.find(fold => fold.name == singleFolder)
-                            else {
-                                if(_checkFolderExists(singleFolder, _currentFolder.childrens)){
-                                    _currentFolder = _currentFolder.childrens.find(item => item.name == _currentFolder)
-                                }
-                                else {
-                                    _currentFolder.childrens.push(
-                                        {index: index, name: Folder.shortpath, fullpath: Folder.fullpath, childrens: []}
-                                    )
-                                    _currentFolder = _currentFolder.childrens[_currentFolder.childrens.length -1 ];
-                                }
-                            }
-                        })
-                    } else {
-                        _folderStructure.push({index: index, name: Folder.shortpath, fullpath: Folder.fullpath, childrens: [] })
-                    }
+        paths.forEach(path => {
+            if(path.attributes != 64){
+            path.shortpath.split(separator).reduce((r, name, i, a) => {
+                if(!r[name]) {
+                    r[name] = {result: []};
+                    r.result.push({name, children: r[name].result, fullpath: path.fullpath, attributes: path.attributes})
                 }
-            }
-        )
+                return r[name];
+            }, level)
+        }
+}); return result;
     }
     var _getFolders = async function(){
         var _successCallback = function(folders) {
             console.log(folders);
             _inboxFolder_ShortPath = folders[0].shortpath;
             _folders = folders;
-            _getFolderStructure(_folders);
-            console.log(_folderStructure)
+            _folderStructure = _buildPaths(_folders, _folders[0].delimiter);
+            let _treeViewElement = _drawTreeViewFolders(_folderStructure);
+            console.log(_treeViewElement, _treeViewElement.innerHTML);
             $(_selectors.email_container.mailbox_container.folderList.window).html("");
-            folders.forEach(function(folder, index) {
+            $(_selectors.email_container.mailbox_container.folderList.window).append(_treeViewElement);
+            
+            /*folders.forEach(function(folder, index) {
                 if(folder.attributes != 64){
                     $(_selectors.email_container.mailbox_container.folderList.window).append(
                     _createFolderElement(folder.shortpath,index)
                     );
                 }
-            })
+            })*/
         }
         var _errorCallback = function(error) {
             console.error(error);
@@ -129,7 +114,24 @@ chatProject.emailPage = (function (me) {
         _doBindings();
     };
     /* --- INIZIO FUNZIONI GRAFICHE --- */
-
+    
+    var _drawTreeViewFolders = function(refStructure) {
+        let fullStructure = document.createElement("div");
+        refStructure.forEach(
+            element => {
+                let UL_ELEMENT = document.createElement("ul");
+                let LI_ELEMENT = document.createElement("li");
+                let LINK_ELEMENT = document.createElement("a");
+                LINK_ELEMENT.innerHTML = element.name;
+                LI_ELEMENT.append(LINK_ELEMENT)
+                if(element.children != null && element.children != undefined && Array.isArray(element.children) && element.children.length > 0)
+                    LI_ELEMENT.append(_drawTreeViewFolders(element.children))
+                UL_ELEMENT.append(LI_ELEMENT);
+                fullStructure.append(UL_ELEMENT);
+            }
+        )
+        return fullStructure;
+    }
     var _createFolderElement = function(folderName, folderIndex){
         let icon = "";
         if(folderIndex == 0)

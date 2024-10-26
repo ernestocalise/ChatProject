@@ -56,7 +56,7 @@ class EmailManager extends Controller
                 "status" => true
             ]);
             
-        } catch(PhpImap\Exceptions\ConnectionException $ex) {
+        } catch(\Exception $ex) {
             return json_encode((object)[
                 "status" => false,
                 "error" => $ex
