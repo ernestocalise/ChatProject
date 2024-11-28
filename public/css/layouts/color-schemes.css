@@ -1,0 +1,16 @@
+:root {
+    --background: #40444b;
+    --form-elements-background: #202225;
+    --form-elements-background-hover:#2f3136;
+    --active: #7289da;
+    --text-color: #dfdfdf;
+    --color-danger: rgb(185, 60, 60);
+    --notification-bubble-color: rgb(185, 60, 60);
+    --color-add:#2ecc71;
+    --status-active: #2ecc71;
+    --status-away: #f1c40f;
+    --status-busy: var(--color-danger);
+    --status-offline: #95a5a6;
+    font-family: "Inter", sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+  }

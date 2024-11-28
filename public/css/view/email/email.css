@@ -8,8 +8,47 @@
     "sidebar topbar"
     "sidebar main";
     overflow:hidden;
+    position:relative;
 }
-
+.email-container-loader-container{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height: 100%;
+    background: rgba(20, 20, 20,.6);
+    z-index: 500;
+}
+.email-container-loader-container > #email-container-email-spinner{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    animation: rotate-center 0.6s ease-in-out both;
+    animation-iteration-count: infinite;
+    font-size:3rem;
+}
+.email-container-loader-container > .email-container-overlay-dialog-box {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height: 100%;
+    background-color: transparent;
+    backdrop-filter: blur(10px);
+    /* var(--form-elements-background);*/
+    border:1px solid var(--form-elements-background-hover);
+    border-radius: 10px;
+    z-index: 150;
+    display: none;
+    flex-direction: column;
+    padding:2rem;
+    gap:1rem;
+    align-items: center;
+    justify-content: center;
+}
+.email-container-loader-container > .email-container-overlay-dialog-box h1 {
+    font-size:4rem;
+}
 /* INIZIO SIDEBAR */
 .email-container > .mailbox-container {
     grid-area: sidebar;
@@ -50,14 +89,29 @@
 
 .email-container > .mailbox-container > .mailbox-link-container {
     width: 100%;
-} 
+}
+.mailbox-link-container-link-element-level-1 {
+    padding-left:1rem !important;
+}
+.mailbox-link-container-link-element-level-2 {
+    padding-left:2rem !important;
+}
+.mailbox-link-container-link-element-level-3 {
+    padding-left:3rem !important;
+}
+.mailbox-link-container-link-element-level-4 {
+    padding-left:4rem !important;
+}
 .email-container > .mailbox-container > .mailbox-link-container li {
+    cursor: pointer;
+}
+.email-container > .mailbox-container > .mailbox-link-container li a {
     border-top-right-radius: 50px;
     border-bottom-right-radius: 50px;
     padding:10px;
-    padding-left:2rem;
+    text-transform: capitalize;
 }
-.email-container > .mailbox-container > .mailbox-link-container li:hover {
+.email-container > .mailbox-container > .mailbox-link-container li a:hover {
     background:var(--form-elements-background)
 }
 .email-container > .mailbox-container > .mailbox-link-container li a {
@@ -69,7 +123,6 @@
 /* INIZIO TOPBAR */
 .email-container > .topbar {
     grid-area: topbar;
-    border-bottom: 1px solid black;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -122,11 +175,24 @@
 }
 .email-container > .main-container > .main-container-commandBar > .main-container-commandBar-left{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: start;
     align-items: center;
-    width: 1rem;
     gap:1rem;
-    margin-left: 3rem;
+    margin-top: 0.3rem;
+    margin-left:1rem;
+}
+.email-container > .main-container > .main-container-commandBar > .main-container-commandBar-left > .main-container-commandBar-mailList{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap:1rem;
+    margin-top: 0.3rem;
+}
+.email-container > .main-container > .main-container-commandBar > .main-container-commandBar-left > .main-container-commandBar-openMail{
+    display: none;
+    justify-content: start;
+    align-items: center;
+    gap:1rem;
     margin-top: 0.3rem;
 }
 .email-container > .main-container > .main-container-commandBar > .main-container-commandBar-right{
@@ -162,19 +228,111 @@
     flex-direction: row;
     gap: 1rem;
     padding: 0.3rem 1rem;
-    justify-content: center;
     align-items: center;
+    height:35px;
+    justify-content: flex-start;
     border-bottom: 1px solid #dfdfdf69;
     cursor: pointer;
 }
+
 .email-container > .main-container > .main-container-mail-list-container > .main-container-mail-list > .main-container-mail-element:hover {
     background: var(--form-elements-background-hover);
 }
 .email-container > .main-container > .main-container-mail-list-container > .main-container-mail-list > .main-container-mail-element:nth-child(1) {
     border-top: 1px solid #dfdfdf69;
 }
-    /* FINE MAIL LIST */
-/* INIZIO EMAIL CONTAINER */
 
+.email-container > .main-container > .main-container-mail-list-container > .main-container-mail-list > .main-container-mail-element > .main-container-mail-element-sender{
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.email-container > .main-container > .main-container-mail-list-container > .main-container-mail-list > .main-container-mail-element > .main-container-mail-element-content{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.email-container > .main-container > .main-container-mail-list-container > .main-container-mail-list > .main-container-mail-element > .main-container-mail-element-timestamp{
+    width: 200px;
+    font-size:0.8rem;
+}
+/* FINE MAIL LIST */
+/* INIZIO EMAIL CONTAINER */
+.email-container > .main-container > .main-container-email-container {
+    width: 100%;
+    height: 100%;
+    background:#fff;
+    display: none;
+    padding:1rem;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header h2{
+    font-size:1.5rem;
+    color:#000;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header span{
+    font-size:0.7rem;
+    color:#000;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header > .main-container-email-container-recipients{
+    display: flex;
+    gap: 1rem;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header > .main-container-email-container-recipients> .main-container-email-container-recipients-image-container{
+    width: 64px;
+    height: 64px;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header > .main-container-email-container-recipients> .main-container-email-container-recipients-image-container > img{
+    border-radius: 20px;
+    margin-left: 10px;
+    width: 100%;
+    height: 100%;
+}
+.email-container > .main-container > .main-container-email-container >.main-container-email-container-header > .main-container-email-container-recipients> .main-container-email-container-recipients-text-container{
+    display:flex;
+    flex-direction: column;
+}
+.email-container > .main-container > .main-container-email-container > iframe {
+    width: 100%;
+    height: 100%;
+}
 /* FINE EMAIL CONTAINER*/
 /*FINE MAIN CONTAINER*/
+
+
+/*INIZIO ANIMAZIONI*/
+/* ----------------------------------------------
+ * Generated by Animista on 2024-11-6 18:25:9
+ * Licensed under FreeBSD License.
+ * See http://animista.net/license for more info. 
+ * w: http://animista.net, t: @cssanimista
+ * ---------------------------------------------- */
+
+/**
+ * ----------------------------------------
+ * animation rotate-center
+ * ----------------------------------------
+ */
+ @-webkit-keyframes rotate-center {
+    0% {
+      -webkit-transform: rotate(0);
+              transform: rotate(0);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
+  }
+  @keyframes rotate-center {
+    0% {
+      -webkit-transform: rotate(0);
+              transform: rotate(0);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
+  }
+  
+/*FINE ANIMAZIONI */

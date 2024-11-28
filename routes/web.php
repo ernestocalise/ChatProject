@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\FrameController;
 use App\Http\Controllers\EmailManager;
 use App\Http\Controllers\VideoCallController;
 use App\Http\Controllers\VideoConferenceController;
@@ -54,6 +55,8 @@ Route::get("/layout", function() {
 });
 //Chat Application
 if(config("application-cluster.chat_enabled")) {
+    Route::get("/frames/chat", [FrameController::class,"FrameChat"])->name("FrameChat");
+    Route::get("/frames/email", [FrameController::class,"FrameEmail"])->name("FrameEmail");
     //Status Functions
     Route::middleware("auth")->group(function() {
         Route::get("/user/setStatus/{statusCode}", [ProfileController::class, "setStatus"]);
@@ -96,9 +99,10 @@ if(config("application-cluster.chat_enabled")) {
 
 //Email Application
 Route::middleware("auth")->group(function() {
-    Route::get("/email/test", [EmailManager::class, "runTests"]);
+    Route::get("/email/test", [EmailManager::class, "InitializeEmail"]);
+    Route::get("/email/initializeEmail", [EmailManager::class, "InitializeEmail"]);
     Route::get("/email/getFolders", [EmailManager::class, "GetFolders"]);
-
+    Route::post("/email/GetMails", [EmailManager::class, "GetMails"]);
     Route::get("/email", [EmailController::class, "index"])->name("email");
     Route::get("/getFolders", [EmailController::class, "getFolders"]);
     Route::get("/getMailbox/{FolderId}/{orderBy?}/{startPosition?}/{endPosition?}",[EmailController::class, "getMailbox"]);

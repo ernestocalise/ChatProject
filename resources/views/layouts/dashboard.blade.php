@@ -6,6 +6,7 @@
     @yield('head')
     <title>{{ config('app.name', 'Laravel') }}</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="/css/layouts/reset.css">
     <link rel="stylesheet" href="/css/layouts/dashboard.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,17 +82,17 @@
 </div>
 <div class="layout-main">
     <div class="layout-panel" id="layout-panel-chat">
-         @include("chat.chat")
+        <iframe src="{{route('FrameChat')}}" frameborder="0" class="layout-panel-frame">
+        </iframe>
+
     </div>
     <div class="layout-panel" id="layout-panel-profile">
-         @include('profile.edit')
+
     </div>
     <div class="layout-panel" id="layout-panel-email">
-        @include('email.index')
+        <iframe src="{{route('FrameEmail')}}" frameborder="0" class="layout-panel-frame">
+        </iframe>
     </div>
-   <!-- <template shadowrootmode="open">
-        <html><head><style>.main-container{background:red !important; position:absolute; top:0; left:0; }</style></head><p class="main-container">Ciaop</p></html>
-      </template> -->
 </div>
 <div class="layout-panel-incoming-call" id="layout-panel-incoming-call">
     <img src="https://thispersondoesnotexist.com/" class="layout-panel-incoming-call-image" id="layout-panel-incoming-call-image">

@@ -4,9 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use PhpImap;
+use App\Models\EmailsDownloaded;
 class EmailManager extends Controller
 {
-    public static function GetFolders () {
+    public const MAILBOX_CRITERIA_ALL = "ALL";
+    public const MAILBOX_CRITERIA_ANSWERED = "ANSWERED";
+    public const MAILBOX_CRITERIA_BCC = "BCC";
+    public const MAILBOX_CRITERIA_BEFORE = "BEFORE";
+    public const MAILBOX_CRITERIA_BODY = "BODY";
+    public const MAILBOX_CRITERIA_CC = "CC";
+    public const MAILBOX_CRITERIA_DELETED = "DELETED";
+    public const MAILBOX_CRITERIA_FLAGGED = "FLAGGED";
+    public const MAILBOX_CRITERIA_FROM = "FROM";
+    public const MAILBOX_CRITERIA_KEYWORD = "KEYWORD";
+    public const MAILBOX_CRITERIA_NEW = "NEW";
+    public const MAILBOX_CRITERIA_OLD = "OLD";
+    public const MAILBOX_CRITERIA_ON = "ON";
+    public const MAILBOX_CRITERIA_RECENT = "RECENT";
+    public const MAILBOX_CRITERIA_SEEN = "SEEN";
+    public const MAILBOX_CRITERIA_SINCE = "SINCE";
+    public const MAILBOX_CRITERIA_SUBJECT = "SUBJECT";
+    public const MAILBOX_CRITERIA_TEXT = "TEXT";
+    public const MAILBOX_CRITERIA_TO = "TO";
+    public const MAILBOX_CRITERIA_UNANSWERED = "UNANSWERED";
+    public const MAILBOX_CRITERIA_UNDELETED = "UNDELETED";
+    public const MAILBOX_CRITERIA_UNFLAGGED = "UNFLAGGED";
+    public const MAILBOX_CRITERIA_UNKEYWORD = "UNKEYWORD";
+    public const MAILBOX_CRITERIA_UNSEEN = "UNSEEN";
+
+    /* SETUP */
+    public static function GetMailboxObject() {
         $emailConfig = auth()->user()->profile->EmailConfiguration;
         $mailbox = new PhpImap\Mailbox(
             $emailConfig->hostname, // IMAP server and mailbox folder
@@ -21,16 +48,123 @@ class EmailManager extends Controller
             CL_EXPUNGE // expunge deleted mails upon mailbox close
              // don't do non-secure authentication
         );
+        return $mailbox;
+    }
+    public static function checkMailConfigurationIsValidByMailbox(PhpImap\Mailbox $mailbox) {
         try {
-            // Get all emails (messages)
-            // PHP.net imap_search criteria: http://php.net/manual/en/function.imap-search.php
+            $imapStream = $mailbox->getImapStream();
+            return true;
+        } catch(\Exception $ex) {
+            return false;
+        }
+    }
+    /* END SETUP */
+
+    /* FOLDERS RELATED */
+    public static function getFolderByMailBoxObject(PhpImap\Mailbox $mailbox){
+        try {
             $folders = $mailbox->getMailboxes();
             return $folders;
-            
         } catch(PhpImap\Exceptions\ConnectionException $ex) {
             echo "IMAP connection failed: " . implode(",", $ex->getErrors('all'));
             die();
         }
+    }
+    /* END FOLDERS RELATED */
+
+    /* MAIL NUMBER RELATED */
+    public static function getMailIndexesByMailBoxObject(PhpImap\Mailbox $mailbox, $criteria, $userFilters) {
+        $outputCriteria = "";
+        switch($criteria){
+            case EmailManager::MAILBOX_CRITERIA_ALL:
+                $outputCriteria = EmailManager::MAILBOX_CRITERIA_ALL;
+            break;
+        }
+
+        return $mailbox->searchMailbox($outputCriteria);
+    }
+    /* END MAIL NUMBER RELATED */
+
+    /* MAILS RELATED */
+    public static function getMailByMailboxObject(PhpImap\Mailbox $mailbox, $index) {
+        $mail = $mailbox->getMail($index, false);
+        $mail->embedImageAttachments();
+        $mail->mailIndex = $index;
+        $mail->mailTextContent = $mail->textPlain;
+        if($mail->textHtml){
+            $mail->mailContent = $mail->textHtml;
+        } else {
+            $mail->mailContent = $mail->textPlain;
+        }
+        $mail->attachmentsPath = []; 
+        foreach($mail->getAttachments() as $attachment){
+            $mail->attachmentsPath[]=$attachment->name;
+        }
+        return $mail;
+    }
+    public static function getMailsByMailboxObject(PhpImap\Mailbox $mailbox, $mailIndexes, $startIndex, $endIndex) {
+        $mailExtracted = [];
+        if(count($mailIndexes) < $startIndex){
+            return false;
+        }
+        if(count($mailIndexes) < $endIndex){
+            $endIndex = count($mailIndexes);
+        }
+        for($i = $startIndex; $i < $endIndex; $i++){
+            $index = $mailIndexes[$i];
+            if(EmailsDownloaded::where('user_id', '=', auth()->user()->id)->where('msg_number', '=', $index)->exists()){
+                $mail = EmailsDownloaded::where('user_id', '=', auth()->user()->id)->where('msg_number', '=', $index)->first();
+                $mailExtracted[]=json_decode($mail->json);
+            } else {
+                $mailDownloaded=EmailManager::getMailByMailboxObject($mailbox, $index);
+                $newRecord = new EmailsDownloaded();
+                $newRecord->user_id = auth()->user()->id;
+                $newRecord->msg_number = $index;
+                $newRecord->json = json_encode($mailDownloaded);
+                $newRecord->save();
+                $mailExtracted[]=$mailDownloaded;
+            }
+        }
+        return $mailExtracted;
+    }
+    /* END MAILS RELATED */
+
+    /* EXPOSED FUNCTION */
+    public static function GetMails(Request $request) {
+        $data = $request->validate([
+            "mailIndexes" => "required|array",
+            "mailbox" => "required|string"
+        ]);
+        $mailBox = EmailManager::GetMailboxObject();
+        $mailBox->switchMailbox($data["mailbox"]);
+        return EmailManager::getMailsByMailboxObject($mailBox, $data["mailIndexes"], 0, count($data["mailIndexes"])-1);
+    }
+    public static function InitializeEmail() {
+        $mailbox = EmailManager::GetMailboxObject();
+        if($mailbox == null){
+            die("Mailbox is null");
+        }
+        $mailbox->setAttachmentsIgnore(false);
+        $mailbox->setAttachmentsDir("storage/mails/attachments/");
+        if(EmailManager::checkMailConfigurationIsValidByMailbox($mailbox)){
+            $folders = EmailManager::getFolderByMailBoxObject($mailbox);
+            $mailbox->switchMailbox($folders[0]["fullpath"]);
+            $mailIndexes = EmailManager::getMailIndexesByMailBoxObject($mailbox, EmailManager::MAILBOX_CRITERIA_ALL, null);
+            $mailIndexes = array_reverse($mailIndexes);
+            $mailExtracted = EmailManager::getMailsByMailboxObject($mailbox, $mailIndexes, 0, 75);
+            return (object)[
+                "folders" => $folders,
+                "count" => count($mailIndexes),
+                "mailIndexes" => $mailIndexes,
+                "currentFolder" => $folders[0],
+                "mails" => $mailExtracted,
+                "startIndex" => 0,
+                "endIndex" => 25
+            ];
+        } else {
+            return -1;
+        }
+        
     }
     public static function IsMailConfigurationValid() {
         $emailConfig = auth()->user()->profile->EmailConfiguration;
@@ -63,55 +197,5 @@ class EmailManager extends Controller
             ]);
         }
     }
-    public function RunTests () {
-        $emailConfig = auth()->user()->profile->EmailConfiguration;
-        $mailbox = new PhpImap\Mailbox(
-            "{pop.securemail.pro:993/imap/ssl/novalidate-cert}INBOX", // IMAP server and mailbox folder
-            $emailConfig->getUsername(), // Username for the before configured mailbox
-            $emailConfig->getPassword(), // Password for the before configured username
-            __DIR__, // Directory, where attachments will be saved (optional)
-            'UTF-8', // Server encoding (optional)
-            true, // Trim leading/ending whitespaces of IMAP path (optional)
-            false // Attachment filename mode (optional; false = random filename; true = original filename)
-        );
-        $mailbox->setAttachmentsDir("storage/mails/attachments/");
-        //$mailbox->setAttachmentsIgnore(true);
-        // set some connection arguments (if appropriate)
-        $mailbox->setConnectionArgs(
-            CL_EXPUNGE // expunge deleted mails upon mailbox close
-             // don't do non-secure authentication
-        );
-        
-        try {
-            // Get all emails (messages)
-            // PHP.net imap_search criteria: http://php.net/manual/en/function.imap-search.php
-            $mailsIds = $mailbox->searchMailbox();
-        } catch(PhpImap\Exceptions\ConnectionException $ex) {
-            echo "IMAP connection failed: " . implode(",", $ex->getErrors('all'));
-            die();
-        }
-        
-        // If $mailsIds is empty, no emails could be found
-        if(!$mailsIds) {
-            die('Mailbox is empty');
-        }
-        $mailsIds = array_reverse($mailsIds);
-        // Get the first message
-        // If '__DIR__' was defined in the first line, it will automatically
-        // save all attachments to the specified directory
-        $mail = $mailbox->getMail($mailsIds[0]);
-        
-
-        // Print all information of $mail
-        if($mail->textHtml){
-            dd($mail->textHtml);
-        } else {
-            dd($mail->textPlain);
-        }
-        dd($mail);
-        
-        // Print all attachements of $mail
-        echo "\n\nAttachments:\n";
-        print_r($mail->getAttachments());
-    }
+    /* END EXPOSED FUNCTIONS*/
 }

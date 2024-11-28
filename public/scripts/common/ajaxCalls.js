@@ -105,13 +105,20 @@ export function ajaxCall() {
     var _getStatus = function (userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/user/getStatus/${userId}`, successCallback, errorCallback);
     };
+
+    // Email Functions
     var _getFolders = function (successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/email/getFolders`, successCallback, errorCallback);
     }
     var _getMailbox = function (mailboxId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executeGETRequest(`/getMailbox/${mailboxId}`, successCallback, errorCallback)
     }
-
+    var _initializeEmail = function(successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executeGETRequest(`/email/initializeEmail`, successCallback, errorCallback)
+    }
+    var _getMails = function(params, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
+        _executePOSTRequest('/email/GetMails', params, successCallback, errorCallback)
+    }
     // VideoChatFunction
     var _getUserInformation = async function(userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         return  _executeGETRequest(`/user/getUserInformation/${userId}`, successCallback, errorCallback )
@@ -159,7 +166,9 @@ export function ajaxCall() {
         },
         email: {
             getFolders: _getFolders,
-            getMailBox: _getMailbox
+            getMailBox: _getMailbox,
+            initializeEmail: _initializeEmail,
+            getMails: _getMails
         },
         executeAsyncPOSTRequest: _executeAsyncPOSTRequest
     };
