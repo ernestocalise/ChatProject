@@ -119,6 +119,12 @@ export function ajaxCall() {
     var _getMails = function(params, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         _executePOSTRequest('/email/GetMails', params, successCallback, errorCallback)
     }
+    var _switchFolder = function(params, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback){
+        _executePOSTRequest("/email/switchFolder", params, successCallback, errorCallback)
+    }
+    var _sendMail = function(params,successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback){
+        _executePOSTRequest("/email/sendEmail", params, successCallback, errorCallback)
+    }
     // VideoChatFunction
     var _getUserInformation = async function(userId, successCallback = _defaultSuccessCallback, errorCallback = _defaultErrorCallback) {
         return  _executeGETRequest(`/user/getUserInformation/${userId}`, successCallback, errorCallback )
@@ -168,7 +174,9 @@ export function ajaxCall() {
             getFolders: _getFolders,
             getMailBox: _getMailbox,
             initializeEmail: _initializeEmail,
-            getMails: _getMails
+            getMails: _getMails,
+            switchFolder: _switchFolder,
+            sendEmail: _sendMail
         },
         executeAsyncPOSTRequest: _executeAsyncPOSTRequest
     };

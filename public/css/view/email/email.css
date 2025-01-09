@@ -1,3 +1,7 @@
+html,body {
+    width:100%; height:100%;
+}
+
 .email-container {
     width: 100%;
     height: 100%;
@@ -298,7 +302,57 @@
     height: 100%;
 }
 /* FINE EMAIL CONTAINER*/
-/*FINE MAIN CONTAINER*/
+/* INIZIO EMAIL COMPOSER */
+.email-container > .main-container > .main-container-mail-composer-container {
+    width: 100%;
+    height: 100%;
+    background:#fff;
+    display: none;
+    padding:1rem;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header {
+    display:grid;
+    grid-template-areas: 
+    "a a a a a a a a a a a b" 
+    "c c c c d d d d e e e e";
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header >label > #mail-container-email-composer-header-subject {
+    width:90%;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header > button {
+    width: 100%;
+    background-color: var(--active);
+    height: 100%;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-left:1rem;
+    transition: all 0.3s ease;
+    font-size: 3rem;
+    color: rgb(223, 223, 223);
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header > button:hover {
+    opacity: 0.8;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header > button > span{
+    font-size: 2.5rem;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header > label {
+    padding:1rem;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header > label:first-child {
+    grid-area:a;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header *{
+    color:#000;
+}
+.email-container > .main-container > .main-container-mail-composer-container > .main-container-email-composer-header input[type="text"] {
+    width: 80%;
+    margin-left:1rem;
+}
+
+    /*FINE MAIN CONTAINER*/
 
 
 /*INIZIO ANIMAZIONI*/

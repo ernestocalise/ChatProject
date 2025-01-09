@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<head>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="/css/layouts/reset.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -8,6 +10,8 @@
 <link rel="stylesheet" href="/css/layouts/core.css">
 <link rel="stylesheet" href="/css/view/email/email.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
 <div class="csrf-container">
     @csrf
     </div>
@@ -88,6 +92,20 @@
             </div>
             <iframe src="" frameborder="0" id="email-container-main-container-email-container-iframe"></iframe>
         </div>
+        <div class="main-container-mail-composer-container" id="email-container-main-container-mail-composer-container">
+            <div class="main-container-email-composer-header">
+                <label for="mail-container-email-composer-header-subject">Oggetto:
+                    <input type="text" name="mail-container-email-composer-header-subject" id="mail-container-email-composer-header-subject" />
+                </label>
+                <button id="mail-container-email-composer-header-btnSend"><span class="material-symbols-outlined">
+                    send
+                    </span></button>
+                <label for="mail-container-email-composer-header-to"> A: <input type="text" name="mail-container-email-composer-header-to" id="mail-container-email-composer-header-to"></label>
+                <label for="mail-container-email-composer-header-CC"> CC: <input type="text" name="mail-container-email-composer-header-CC" id="mail-container-email-composer-header-CC"></label>
+                <label for="mail-container-email-composer-header-CCN"> CCN: <input type="text" name="mail-container-email-composer-header-CCN" id="mail-container-email-composer-header-CCN"></label>
+            </div>
+            <textarea name="main-container-email-container-mail-composer-textarea" id="main-container-email-container-mail-composer-textarea"></textarea>
+        </div>
     </div>
 </div>
 <input type="hidden" id="hidden-components-data" value="" />
@@ -103,4 +121,6 @@
     document.getElementById("hidden-components-data").value =dataForComponents_Value;
 
 </script>
+<script src="/scripts/common/libs/tinymce/tinymce.min.js"></script>
 <script src="/scripts/view/newemail.js" type="module"></script>
+</body>

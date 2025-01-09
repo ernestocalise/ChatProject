@@ -64,6 +64,16 @@ chatProject.emailPage = (function (me) {
                         timestamp:"#mail-container-email-container-header-timestamp",
                     },
                     frame: "#email-container-main-container-email-container-iframe"
+                },
+                emailComposer:{
+                    window:"#email-container-main-container-mail-composer-container",
+                    textarea: "#main-container-email-container-mail-composer-textarea",
+                    btnSend: "#mail-container-email-composer-header-btnSend",
+                    subject: "#mail-container-email-composer-header-subject",
+                    to: "#mail-container-email-composer-header-to",
+                    cc: "#mail-container-email-composer-header-CC",
+                    ccn: "#mail-container-email-composer-header-CCN",
+                    item: null
                 }
             }
         }
@@ -140,9 +150,27 @@ chatProject.emailPage = (function (me) {
         await chatProject.fh.time.sleep(500);
         if(_componentsData.user.isMailConfigurationValid.status){
             _initializeEmails();
+            _initializeEmailComposer();
         }
         _doBindings();
     };
+    var _initializeEmailComposer = function () {
+        tinymce.init({
+            selector: _selectors.email_container.mailbox_container.emailComposer.textarea,
+            width: '100%',
+            height: '70%',
+            plugins:[
+                'advlist', 'autolink', 'link', 'image', 'lists', 'charmap', 'preview', 'anchor', 'pagebreak',
+                'searchreplace', 'wordcount', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 
+                'table', 'emoticons', 'template', 'codesample'
+            ],
+            toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify |' + 
+            'table bullist numlist outdent indent | link image | print preview media fullscreen | ' +
+            'forecolor backcolor emoticons',
+            menubar: '',
+            content_style: 'body{font-family:Helvetica,Arial,sans-serif; font-size:16px}'
+        });
+    }
     /* --- INIZIO FUNZIONI GRAFICHE --- */
     var _getTreeViewImage = function(elementName) {
         let iconName = "";
@@ -175,6 +203,7 @@ chatProject.emailPage = (function (me) {
         $(_selectors.email_container.mailbox_container.commandBar.mailList.window).css("display","flex");
         $(_selectors.email_container.mailbox_container.emailContainer.window).css("display","none");
         $(_selectors.email_container.mailbox_container.commandBar.openMail.window).css("display","none");
+        $(_selectors.email_container.mailbox_container.emailComposer.window).css("display", "none");
     }
     var _drawTreeViewFolders = function(refStructure, level) {
         level = level+1;
@@ -183,9 +212,12 @@ chatProject.emailPage = (function (me) {
             element => {
                 let LI_ELEMENT = document.createElement("li");
                 let LINK_ELEMENT = document.createElement("a");
+                LINK_ELEMENT.classList.add("mailbox-link-container-link-element");
                 LINK_ELEMENT.classList.add(`mailbox-link-container-link-element-level-${level}`);
+                LINK_ELEMENT.setAttribute("area-folder-fullpath", element.fullpath);
                 let SpanImage = _getTreeViewImage(element.name.toUpperCase());
                 LINK_ELEMENT.innerHTML = SpanImage+element.name.toLowerCase();
+                console.log(element);
                 LI_ELEMENT.append(LINK_ELEMENT)
                 if(element.children != null && element.children != undefined && Array.isArray(element.children) && element.children.length > 0){
                     LI_ELEMENT.append(_drawTreeViewFolders(element.children, level))
@@ -311,6 +343,50 @@ chatProject.emailPage = (function (me) {
 
     /* --- INIZIO CHAMATE AJAX --- */
 
+    var _changeSelectedFolder = async function(folderFullPath) {
+        console.log(folderFullPath);
+        _showLoader();
+        var _successCallback = function(response) {
+            _hideLoader();
+            _initializeCurrentFolder(response.mailIndexes, response.mails, folderFullPath, null);
+            _updateMailListPageCount();
+            _loadMails();
+        }
+        var _errorCallback = function(response) {
+            _hideLoader();
+            console.error(response);
+            alert(response.message.toString());
+        }
+        chatProject.ajaxCall.switchFolder({mailbox: folderFullPath,   "_token" : $(_selectors.csrf_token).attr("content")}, _successCallback, _errorCallback);
+    }
+    var _enableFoldersLinks = async function() {
+        $(".mailbox-link-container-link-element").click(function() {
+            _changeSelectedFolder($(this).attr("area-folder-fullpath"));
+
+        });
+    }
+    var _onBtnCreateClick = async function() {
+        $(_selectors.email_container.mailbox_container.emailComposer.window).css("display", "block");
+        $(_selectors.email_container.mailbox_container.mailList.container.window).css("display","none");
+        $(_selectors.email_container.mailbox_container.commandBar.mailList.window).css("display","none");
+        $(_selectors.email_container.mailbox_container.commandBar.openMail.window).css("display","flex");
+        $(_selectors.email_container.mailbox_container.emailContainer.window).css("display","none");
+    }
+    var _sendEmail = async function() {
+        let _params = {
+            "_token" : $(_selectors.csrf_token).attr("content"),
+            to : $(_selectors.email_container.mailbox_container.emailComposer.to).val(),
+            subject : $(_selectors.email_container.mailbox_container.emailComposer.subject).val(),
+            cc : $(_selectors.email_container.mailbox_container.emailComposer.cc).val(),
+            ccn : $(_selectors.email_container.mailbox_container.emailComposer.ccn).val(),
+            message : tinyMCE.activeEditor.getContent()
+        }
+        console.log(_params);
+        var successCallback = function(response) {
+            console.log(response);
+        }
+        chatProject.ajaxCall.sendEmail(_params, successCallback, successCallback);
+    }
     var _initializeEmails = async function() {
         var _successCallback = function(response) {
             if(response==-1){
@@ -323,6 +399,7 @@ chatProject.emailPage = (function (me) {
             _initializeCurrentFolder(response.mailIndexes, response.mails, response.folders[0].fullpath, response.folders[0]);
             _updateMailListPageCount();
             _loadMails();
+            _enableFoldersLinks();
             _hideLoader();
         }
         var _errorCallback = function(error) {
@@ -356,6 +433,8 @@ chatProject.emailPage = (function (me) {
         $(_selectors.email_container.mailbox_container.commandBar.openMail.btnBack).on("click", _onCommandBarBtnBack_Click)
         $(_selectors.email_container.mailbox_container.commandBar.mailList.btnBack).on("click", _previousMailPage);
         $(_selectors.email_container.mailbox_container.commandBar.mailList.btnForward).on("click", _nextMailPage);
+        $(_selectors.email_container.mailbox_container.btnCreate).on("click", _onBtnCreateClick);
+        $(_selectors.email_container.mailbox_container.emailComposer.btnSend).on("click", _sendEmail);
         /*
         $("#searchbar").keypress(function(e) {
             if(e.which == 10 || e.which == 13) {

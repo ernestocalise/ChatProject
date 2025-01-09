@@ -103,6 +103,9 @@ chatProject.chatPage = (function (me) {
         tmrCheckChatCount: null,
         tmrUploadFile: null
     };
+    var _callsPending = {
+        CheckChatChanged : false,
+    }
     var _initialize = async function(){
         await chatProject.fh.time.sleep(500);
         _readPhpPageData();
@@ -207,7 +210,11 @@ chatProject.chatPage = (function (me) {
         chatProject.ajaxCall.uploadFile(formData);
     };
     var _checkChatChanged = function () {
+        if(_callsPending.CheckChatChanged)
+            return;
+        _callsPending.CheckChatChanged = true;
         _arrCurrentChats.forEach(singleChat => {
+        try {
             let _data = {
                 '_token': _widgets.csrf_token.attr("content"),
                 'chatId': singleChat.chatId,
@@ -221,7 +228,11 @@ chatProject.chatPage = (function (me) {
             let _errorCallback = function() {
             };
             chatProject.ajaxCall.checkChatChanged(_data, _successCallback, _errorCallback);
-        });
+        } catch {
+
+        }
+    });
+    _callsPending.CheckChatChanged = false;
     };
     var _updateChat = function(chatId, messageId) {
         let _data = {

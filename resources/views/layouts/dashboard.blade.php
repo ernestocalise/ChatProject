@@ -87,7 +87,7 @@
 
     </div>
     <div class="layout-panel" id="layout-panel-profile">
-
+        @include('profile.edit')
     </div>
     <div class="layout-panel" id="layout-panel-email">
         <iframe src="{{route('FrameEmail')}}" frameborder="0" class="layout-panel-frame">

@@ -103,6 +103,8 @@ Route::middleware("auth")->group(function() {
     Route::get("/email/initializeEmail", [EmailManager::class, "InitializeEmail"]);
     Route::get("/email/getFolders", [EmailManager::class, "GetFolders"]);
     Route::post("/email/GetMails", [EmailManager::class, "GetMails"]);
+    Route::post("/email/switchFolder", [EmailManager::class, "SwitchFolder"]);
+    Route::post("/email/sendEmail", [EmailManager::class, "SendEmail"]);
     Route::get("/email", [EmailController::class, "index"])->name("email");
     Route::get("/getFolders", [EmailController::class, "getFolders"]);
     Route::get("/getMailbox/{FolderId}/{orderBy?}/{startPosition?}/{endPosition?}",[EmailController::class, "getMailbox"]);

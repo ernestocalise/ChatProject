@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use PhpImap;
 use App\Models\EmailsDownloaded;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 class EmailManager extends Controller
 {
     public const MAILBOX_CRITERIA_ALL = "ALL";
@@ -39,7 +42,7 @@ class EmailManager extends Controller
             $emailConfig->hostname, // IMAP server and mailbox folder
             $emailConfig->getUsername(), // Username for the before configured mailbox
             $emailConfig->getPassword(), // Password for the before configured username
-            __DIR__, // Directory, where attachments will be saved (optional)
+            "storage/mails/attachments/", // Directory, where attachments will be saved (optional)
             'UTF-8', // Server encoding (optional)
             true, // Trim leading/ending whitespaces of IMAP path (optional)
             true // Attachment filename mode (optional; false = random filename; true = original filename)
@@ -139,6 +142,23 @@ class EmailManager extends Controller
         $mailBox->switchMailbox($data["mailbox"]);
         return EmailManager::getMailsByMailboxObject($mailBox, $data["mailIndexes"], 0, count($data["mailIndexes"])-1);
     }
+    public static function SwitchFolder(Request $request) {
+        $data = $request->validate([
+            "mailbox" => "required|string"
+        ]);
+        $mailBox = EmailManager::GetMailboxObject();
+        $mailBox->switchMailbox($data["mailbox"]);
+        $mailIndexes = array_reverse(EmailManager::getMailIndexesByMailBoxObject($mailBox, EmailManager::MAILBOX_CRITERIA_ALL, null));
+        $mailExtracted = EmailManager::getMailsByMailboxObject($mailBox, $mailIndexes, 0, 75);
+            return (object)[
+                "count" => count($mailIndexes),
+                "mailIndexes" => $mailIndexes,
+                "currentFolder" => $data["mailbox"],
+                "mails" => $mailExtracted,
+                "startIndex" => 0,
+                "endIndex" => 25
+            ];
+    }
     public static function InitializeEmail() {
         $mailbox = EmailManager::GetMailboxObject();
         if($mailbox == null){
@@ -166,13 +186,77 @@ class EmailManager extends Controller
         }
         
     }
+    public static function SendEmail(Request $request) {
+
+        $data = $request->validate([
+            "to" => "required|string",
+            "subject" => "required|string",
+            "cc" => "string",
+            "ccn" => "string",
+            "message" => "required|string"
+        ]);
+
+        $to = $data["to"];
+        $cc = $data["cc"] || null;
+        $ccn = $data["ccn"] || null;
+        $message = $data["message"];
+        $subject = $data["subject"];
+        $mail = new PHPMailer(true);
+        $emailConfig = auth()->user()->profile->EmailConfiguration;
+
+        $mail->isSMTP();
+        $mail->Host = "authsmtp.securemail.pro";
+        $mail->SMTPAuth = true;
+        $mail->Username = $emailConfig->getUsername();
+        $mail->Password = $emailConfig->getPassword();
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 25;
+
+        // Sender information
+        $mail->setFrom($emailConfig->getUsername(), auth()->user()->name);
+        $mail->addAddress($emailConfig->getUsername());
+        $toAddresses = explode(";", $to);
+        foreach($toAddresses as $address) {
+            $mail->addReplyTo($address, $address); 
+        }
+        // if($cc != null){
+        //     $ccAddresses = explode(";", $cc);
+        //     foreach($ccAddresses as $address) {
+        //         $mail->addCC($address, $address); 
+        //     }
+        // }
+        // if($ccn != null){
+        //     $ccnAddresses = explode(";", $ccn);
+        //     foreach($ccnAddresses as $address) {
+        //         $mail->addBCC($address, $address); 
+        //     }
+        // }
+$mail->isHTML(true);
+
+$mail->Subject = $subject;
+
+$mail->Body    = $message;
+// Attempt to send the email
+if (!$mail->send()) {
+    return (object) [
+        "status" => -1,
+        "message" => $mail->ErrorInfo
+    ];
+} else {
+    return (object) [
+        "status" => 0,
+        "message" => "OK"
+    ];
+}
+
+    }
     public static function IsMailConfigurationValid() {
         $emailConfig = auth()->user()->profile->EmailConfiguration;
         $mailbox = new PhpImap\Mailbox(
             $emailConfig->hostname, // IMAP server and mailbox folder
             $emailConfig->getUsername(), // Username for the before configured mailbox
             $emailConfig->getPassword(), // Password for the before configured username
-            __DIR__, // Directory, where attachments will be saved (optional)
+            "storage/mails/attachments/", // Directory, where attachments will be saved (optional)
             'UTF-8', // Server encoding (optional)
             true, // Trim leading/ending whitespaces of IMAP path (optional)
             true // Attachment filename mode (optional; false = random filename; true = original filename)
